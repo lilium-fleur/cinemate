@@ -1,4 +1,12 @@
 package com.fleur.cinemate.auth.dto;
 
-public record AuthDto() {
+import com.fleur.cinemate.user.dto.UserDto;
+import lombok.Builder;
+
+@Builder
+public record AuthDto(
+        UserDto userDto,
+        String token
+
+) {
 }

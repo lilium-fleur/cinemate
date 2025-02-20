@@ -1,1 +1,25 @@
-spring.application.name=cinemate
+spring:
+  application:
+    name: cinemate
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/cinemate
+    username: postgres
+    password: root
+
+  liquibase:
+    change-log: db/changelog/db.changelog-master.yaml
+
+  jpa:
+    show-sql: true
+
+    hibernate:
+      ddl-auto: none
+
+jwt:
+  secret: 873b3864563bd025a6042e1b01bf8bafa7e2c8eaef329966d1c2e084ebbc24d38e8f20cbc92f0019bb54ba9e7977e543859a00f903236c87bddf4e5319eed95f9e4c5763d7cc481dc9224d4f0d9d9869e14a520527a1088a0ec7aa4afc971ad8895abeb1f53c7c14189d19063d130cf7bb98204c907c0b3c716cc3a66ef5810fc78bf6d8f680976b61f2cc8a4bad22a04b11631d862b18b7497dde654fe2aaa4bde407682e3435e67c361d5a469872db318a050b2cadea5a5b98947aa822fefe8f51f16932d9cceb1a054bb3aa47492f4a529d9b78046babbd0dc3b9a98dbef4cc9896b503f6ca91ee330ce10e9d181af5ed18fda14d1603e03a6326e5798938
+  access:
+    expiration: 60
+  refresh:
+    expiration: 1440

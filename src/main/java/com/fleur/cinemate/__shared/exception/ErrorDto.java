@@ -1,4 +1,11 @@
 package com.fleur.cinemate.__shared.exception;
 
-public record ErrorDto() {
+import lombok.Builder;
+
+@Builder
+public record ErrorDto(
+        int statusCode,
+        String message,
+        String description
+) {
 }
