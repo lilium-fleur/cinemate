@@ -29,11 +29,12 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Long> 
             "AND us.isActive = true ")
     void deactivateAllOtherUserSessions(UserSession userSession);
 
+
     @Modifying
     @Query("UPDATE UserSession us SET us.isActive = false " +
-            "WHERE us.user = :#{#userSession.user} " +
-            "AND us.user = :#{#userSession.id} " +
+            "WHERE us.user = :user " +
+            "AND us.fingerprint = :fingerprint " +
             "AND us.isActive = true")
-    void deactivateUserSession(UserSession userSession);
+    void deactivateSessionByFingerprintAndUser(String fingerprint, User user);
 
 }

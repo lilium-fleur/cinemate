@@ -1,5 +1,6 @@
 package com.fleur.cinemate.token.shared;
 
+import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.usersession.UserSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,6 +17,13 @@ public interface TokenRepository<T extends TokenEntity> extends JpaRepository<T,
             "WHERE t.userSession = :userSession " +
             "AND t.isRevoked = false")
     void revokeAllActiveTokensByUserSession(UserSession userSession);
+
+    @Modifying
+    @Query("UPDATE #{#entityName} t SET t.isRevoked = true " +
+            "WHERE t.userSession.user = :user " +
+            "AND t.userSession.fingerprint = :fingerprint " +
+            "AND t.isRevoked = false")
+    void revokeAllActiveTokensByFingerprintAndUser(String fingerprint, User user);
 
     Optional<T> findByToken(String token);
 }

@@ -107,7 +107,7 @@ public class AuthService {
             throw new AccessDeniedException("Invalid refresh token");
         }
 
-        accessTokenService.deactivateActiveTokens(refreshTokenEntity.getUserSession());
+        accessTokenService.revokeActiveTokens(refreshTokenEntity.getUserSession());
 
         CreateTokenDto createTokenDto = CreateTokenDto.builder()
                 .userSession(refreshTokenEntity.getUserSession())

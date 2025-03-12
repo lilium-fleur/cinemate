@@ -1,26 +1,22 @@
 package com.fleur.cinemate.usersession;
 
+import com.fleur.cinemate.__shared.model.BaseEntity;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Table(name = "user_sessions")
 @Entity
-public class UserSession {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserSession extends BaseEntity {
 
     @Column(name = "ip_address", nullable = false)
     private String ipAddress;

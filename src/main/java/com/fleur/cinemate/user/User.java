@@ -1,29 +1,24 @@
 package com.fleur.cinemate.user;
 
+import com.fleur.cinemate.__shared.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "users")
 @Entity
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -33,11 +28,6 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String password;
-
-    @CreatedDate
-    @Column(nullable = false)
-    @Builder.Default
-    private Instant createdAt = Instant.now();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

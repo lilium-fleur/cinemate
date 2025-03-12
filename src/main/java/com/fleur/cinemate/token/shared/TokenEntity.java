@@ -1,15 +1,14 @@
 package com.fleur.cinemate.token.shared;
 
+import com.fleur.cinemate.__shared.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,19 +17,10 @@ import java.time.Instant;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Table(name = "tokens")
 @Entity
-public class TokenEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class TokenEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String token;
-
-    @Column(nullable = false)
-    @CreatedDate
-    @Builder.Default
-    private Instant createdAt = Instant.now();
 
     @Column(nullable = false)
     private Instant expiresAt;

@@ -38,8 +38,13 @@ public abstract class TokenService<T extends TokenEntity> {
     }
 
     @Transactional
-    public void deactivateActiveTokens(UserSession userSession){
+    public void revokeActiveTokens(UserSession userSession){
         tokenRepository.revokeAllActiveTokensByUserSession(userSession);
+    }
+
+    @Transactional
+    public void revokeActiveTokensByFingerprintAndUser(String fingerprint, User user){
+        tokenRepository.revokeAllActiveTokensByFingerprintAndUser(fingerprint, user);
     }
 
     @Transactional(readOnly = true)

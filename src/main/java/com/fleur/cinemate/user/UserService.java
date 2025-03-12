@@ -23,7 +23,7 @@ public class UserService {
         User user = User.builder()
                 .username(registerDto.username())
                 .email(registerDto.email())
-                .password(registerDto.password())
+                .password(passwordEncoder.encode(registerDto.password()))
                 .build();
 
         return userRepository.save(user);

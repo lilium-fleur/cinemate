@@ -45,30 +45,30 @@ public class UserSessionService {
                  .map(userSessionMapper::toDto);
     }
 
+    @Transactional
     public void deactivateUserSessionCompletely(User user, String fingerprint){
-        UserSession userSession = userSessionRepository.findActiveByFingerprintAndUser(fingerprint, user)
-                .orElseThrow(() -> new EntityNotFoundException("User session not found"));
-        userSessionRepository.deactivateUserSession(userSession);
-        accessTokenService.deactivateActiveTokens(userSession);
-        refreshTokenService.deactivateActiveTokens(userSession);
+        userSessionRepository.deactivateSessionByFingerprintAndUser(fingerprint, user);
+        accessTokenService.revokeActiveTokensByFingerprintAndUser(fingerprint, user);
+        refreshTokenService.revokeActiveTokensByFingerprintAndUser(fingerprint, user);
     }
 
     @Transactional
     public void deactivateUserSession(UserSession userSession) {
         userSession.setIsActive(false);
 
-        accessTokenService.deactivateActiveTokens(userSession);
-        refreshTokenService.deactivateActiveTokens(userSession);
+        accessTokenService.revokeActiveTokens(userSession);
+        refreshTokenService.revokeActiveTokens(userSession);
 
         userSessionRepository.save(userSession);
     }
 
+    @Transactional
     public void deactivateUserSessionById(Long userSessionId) {
         UserSession userSession = userSessionRepository.findById(userSessionId)
                 .orElseThrow(() -> new EntityNotFoundException("UserSession not found"));
         userSession.setIsActive(false);
-        accessTokenService.deactivateActiveTokens(userSession);
-        refreshTokenService.deactivateActiveTokens(userSession);
+        accessTokenService.revokeActiveTokens(userSession);
+        refreshTokenService.revokeActiveTokens(userSession);
         userSessionRepository.save(userSession);
     }
 
