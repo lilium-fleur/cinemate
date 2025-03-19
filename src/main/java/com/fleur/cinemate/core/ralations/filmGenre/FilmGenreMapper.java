@@ -1,0 +1,26 @@
+package com.fleur.cinemate.core.ralations.filmGenre;
+
+import com.fleur.cinemate.core.film.Film;
+import com.fleur.cinemate.core.genre.Genre;
+import com.fleur.cinemate.core.ralations.filmGenre.dto.FilmGenreDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+
+@Mapper(componentModel = "spring")
+public interface FilmGenreMapper {
+    @Mapping(target = "filmId", source = "film", qualifiedByName = "toFilmId")
+    @Mapping(target = "genreId", source = "genre", qualifiedByName = "toGenreId")
+    FilmGenreDto toDto(FilmGenre filmGenre);
+
+
+    @Named("toFilmId")
+    default Long toFilmId(Film film) {
+        return film.getId();
+    }
+
+    @Named("toGenreId")
+    default Long toGenreId(Genre genre) {
+        return genre.getId();
+    }
+}

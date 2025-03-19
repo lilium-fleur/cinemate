@@ -1,19 +1,19 @@
 package com.fleur.cinemate.auth;
 
-import com.fleur.cinemate.__shared.jwt.JwtTokenUtil;
+import com.fleur.cinemate.auth.jwt.JwtTokenUtil;
 import com.fleur.cinemate.auth.dto.AuthDto;
 import com.fleur.cinemate.auth.dto.LoginDto;
 import com.fleur.cinemate.auth.dto.RegisterDto;
-import com.fleur.cinemate.token.access.AccessTokenService;
-import com.fleur.cinemate.token.refresh.RefreshToken;
-import com.fleur.cinemate.token.refresh.RefreshTokenService;
-import com.fleur.cinemate.token.shared.TokenEntity;
-import com.fleur.cinemate.token.shared.dto.CreateTokenDto;
+import com.fleur.cinemate.auth.token.access.AccessTokenService;
+import com.fleur.cinemate.auth.token.refresh.RefreshToken;
+import com.fleur.cinemate.auth.token.refresh.RefreshTokenService;
+import com.fleur.cinemate.auth.token.shared.TokenEntity;
+import com.fleur.cinemate.auth.dto.CreateTokenDto;
 import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.user.UserMapper;
 import com.fleur.cinemate.user.UserService;
-import com.fleur.cinemate.usersession.UserSession;
-import com.fleur.cinemate.usersession.UserSessionService;
+import com.fleur.cinemate.user.usersession.UserSession;
+import com.fleur.cinemate.user.usersession.UserSessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +46,7 @@ public class AuthService {
                  .token(accessToken.getToken())
                  .build();
     }
+
 
     @Transactional
     public AuthDto login(LoginDto loginDto, HttpServletRequest request, HttpServletResponse response) {

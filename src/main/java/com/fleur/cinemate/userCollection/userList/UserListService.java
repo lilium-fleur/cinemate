@@ -1,9 +1,8 @@
 package com.fleur.cinemate.userCollection.userList;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
-import com.fleur.cinemate.film.Film;
-import com.fleur.cinemate.film.FilmMapper;
-import com.fleur.cinemate.film.FilmService;
+import com.fleur.cinemate.core.film.Film;
+import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.userCollection.userList.dto.CreateUserListDto;
 import com.fleur.cinemate.userCollection.userList.dto.UserListDto;
@@ -20,22 +19,29 @@ public class UserListService {
     private final UserListRepository userListRepository;
     private final FilmService filmService;
     private final UserListMapper userListMapper;
-    private final FilmMapper filmMapper;
 
     @Transactional
     public UserListDto addFilmToList(CreateUserListDto createUserListDto, User user){
-        Film film = filmService.findFilmEntityById(createUserListDto.filmId());
-        UserListType userListType = UserListType.valueOf(createUserListDto.type());
+        try {
+            Film film = filmService.findFilmEntityById(createUserListDto.filmId());
+            UserListType userListType = UserListType.valueOf(createUserListDto.type().toUpperCase());
+            userListRepository.findByUserAndFilmAndType(user, film, userListType)
+                    .ifPresent(userList -> {
+                        throw new BadRequestException
+                                (String.format("This Film already added to list: %s", userListType));
+                    });
 
-        userListRepository.findByUserAndFilmAndType(user, film, userListType)
-                .ifPresent(userList -> {
-                    throw new BadRequestException
-                            (String.format("This Film already added to list: %s", userListType));
-                });
+            UserList userList = UserList.builder()
+                    .user(user)
+                    .film(film)
+                    .type(userListType)
+                    .build();
 
-        UserList userList = userListMapper.toEntity(createUserListDto);
+            return userListMapper.toDto(userListRepository.save(userList));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(String.format("Invalid list type: %s", e.getMessage()));
+        }
 
-        return userListMapper.toDto(userListRepository.save(userList));
     }
 
     @Transactional
@@ -56,4 +62,6 @@ public class UserListService {
             throw new BadRequestException("Invalid list type");
         }
     }
+
+
 }

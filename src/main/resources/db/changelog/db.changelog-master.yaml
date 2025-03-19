@@ -15,3 +15,11 @@ databaseChangeLog:
       file: db/changelog/changes/07-create-actors.sql
   - include:
       file: db/changelog/changes/08-create-film-actors.sql
+  - include:
+      file: db/changelog/changes/09-create-user-lists.sql
+  - include:
+      file: db/changelog/changes/10-create-film-collections.sql
+  - include:
+      file: db/changelog/changes/11-create-film-collection-items.sql
+  - include:
+      file: db/changelog/changes/12-create-ratings.sql

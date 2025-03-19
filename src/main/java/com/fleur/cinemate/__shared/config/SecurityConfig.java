@@ -1,6 +1,6 @@
 package com.fleur.cinemate.__shared.config;
 
-import com.fleur.cinemate.__shared.jwt.JwtAuthFilter;
+import com.fleur.cinemate.auth.jwt.JwtAuthFilter;
 import com.fleur.cinemate.user.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +39,12 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/refresh"
                         ).permitAll()
+                        .requestMatchers(
+                                "/admin/**"
+                        ).hasRole("ADMIN")
+                        .requestMatchers(
+                                "/api/**"
+                        ).hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement

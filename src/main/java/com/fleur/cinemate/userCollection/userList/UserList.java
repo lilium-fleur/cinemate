@@ -1,14 +1,13 @@
 package com.fleur.cinemate.userCollection.userList;
 
 import com.fleur.cinemate.__shared.model.IdEntity;
-import com.fleur.cinemate.film.Film;
+import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
-import java.util.Date;
 
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder

@@ -1,0 +1,43 @@
+package com.fleur.cinemate.core.ralations.filmGenre;
+
+import com.fleur.cinemate.core.genre.GenreService;
+import com.fleur.cinemate.core.genre.dto.GenreDto;
+import com.fleur.cinemate.core.ralations.filmGenre.dto.CreateFilmGenreDto;
+import com.fleur.cinemate.core.ralations.filmGenre.dto.FilmGenreDto;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/films/{filmId}/genres")
+public class FilmGenreController {
+
+    private final FilmGenreService filmGenreService;
+    private final GenreService genreService;
+
+    @PostMapping
+    public ResponseEntity<FilmGenreDto> addGenreToFilm(
+            @PathVariable Long filmId,
+            @RequestBody @Valid CreateFilmGenreDto createFilmGenreDto){
+        return ResponseEntity.ok(filmGenreService.addGenreToFilm(filmId, createFilmGenreDto));
+    }
+    @GetMapping
+    public ResponseEntity<Page<GenreDto>> getFilmGenres(
+            @PathVariable Long filmId,
+            @PageableDefault Pageable pageable){
+        return ResponseEntity.ok(genreService.findGenresByFilm(filmId, pageable));
+    }
+
+    @DeleteMapping("/{genreId}")
+    public ResponseEntity<Void> deleteGenreFromFilm(
+            @PathVariable Long filmId,
+            @PathVariable Long genreId){
+        filmGenreService.deleteGenreFromFilm(genreId, filmId);
+        return ResponseEntity.noContent().build();
+    }
+}

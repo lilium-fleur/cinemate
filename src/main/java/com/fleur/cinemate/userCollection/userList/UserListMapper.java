@@ -1,6 +1,6 @@
 package com.fleur.cinemate.userCollection.userList;
 
-import com.fleur.cinemate.film.Film;
+import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.userCollection.userList.dto.CreateUserListDto;
 import com.fleur.cinemate.userCollection.userList.dto.UserListDto;

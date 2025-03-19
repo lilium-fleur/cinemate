@@ -1,0 +1,20 @@
+package com.fleur.cinemate.userCollection.collection.collection;
+
+import com.fleur.cinemate.user.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CollectionRepository extends JpaRepository<Collection, Long> {
+    Page<Collection> findAllByUser(User user, Pageable pageable);
+
+    @Query("SELECT fc FROM Collection fc " +
+            "WHERE fc.user.id = :userId " +
+            "AND fc.isPublic = true")
+    Page<Collection> findAllPublicByUserId(Long userId, Pageable pageable);
+
+
+}
