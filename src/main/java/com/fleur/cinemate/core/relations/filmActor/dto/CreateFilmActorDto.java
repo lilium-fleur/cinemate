@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.ralations.filmActor.dto;
+package com.fleur.cinemate.core.relations.filmActor.dto;
 
 import jakarta.validation.constraints.NotNull;
 

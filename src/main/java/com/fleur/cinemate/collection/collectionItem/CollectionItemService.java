@@ -1,13 +1,13 @@
-package com.fleur.cinemate.userCollection.collection.collectionItem;
+package com.fleur.cinemate.collection.collectionItem;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.collection.collection.Collection;
-import com.fleur.cinemate.userCollection.collection.collection.CollectionService;
-import com.fleur.cinemate.userCollection.collection.collectionItem.dto.CreateCollectionItemDto;
-import com.fleur.cinemate.userCollection.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.Collection;
+import com.fleur.cinemate.collection.CollectionService;
+import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -109,6 +110,16 @@ public class CollectionItemService {
 
         return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable)
                 .map(collectionItemMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findFilmIdsByCollection(
+            Long filmCollectionId){
+        Long collectionId = collectionService.findPublicCollectionById(filmCollectionId).getId();
+
+        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, Pageable.unpaged())
+                .map(collectionItem -> collectionItem.getFilm().getId())
+                .toList();
     }
 
 
