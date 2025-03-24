@@ -1,7 +1,7 @@
-package com.fleur.cinemate.core.raiting;
+package com.fleur.cinemate.core.rating;
 
 import com.fleur.cinemate.core.film.Film;
-import com.fleur.cinemate.core.raiting.dto.RatingDto;
+import com.fleur.cinemate.core.rating.dto.RatingDto;
 import com.fleur.cinemate.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

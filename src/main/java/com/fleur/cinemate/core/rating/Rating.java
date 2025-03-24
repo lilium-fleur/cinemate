@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.raiting;
+package com.fleur.cinemate.core.rating;
 
 
 import com.fleur.cinemate.__shared.model.BaseEntity;
