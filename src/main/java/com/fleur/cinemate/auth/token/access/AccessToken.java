@@ -1,7 +1,7 @@
 package com.fleur.cinemate.auth.token.access;
 
 import com.fleur.cinemate.auth.token.shared.TokenEntity;
-import com.fleur.cinemate.user.usersession.UserSession;
+import com.fleur.cinemate.user.session.UserSession;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;

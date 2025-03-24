@@ -1,7 +1,7 @@
 package com.fleur.cinemate.auth.token.shared;
 
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.user.usersession.UserSession;
+import com.fleur.cinemate.user.session.UserSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

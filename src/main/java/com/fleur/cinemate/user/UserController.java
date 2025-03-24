@@ -1,9 +1,9 @@
 package com.fleur.cinemate.user;
 
-import com.fleur.cinemate.userCollection.collection.collection.CollectionService;
-import com.fleur.cinemate.userCollection.collection.collection.dto.CollectionDto;
-import com.fleur.cinemate.userCollection.collection.collectionItem.CollectionItemService;
-import com.fleur.cinemate.userCollection.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.CollectionService;
+import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.collectionItem.CollectionItemService;
+import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
