@@ -1,9 +1,9 @@
-package com.fleur.cinemate.core.raiting;
+package com.fleur.cinemate.core.rating;
 
 
-import com.fleur.cinemate.core.raiting.dto.CreateRatingDto;
-import com.fleur.cinemate.core.raiting.dto.RatingDto;
-import com.fleur.cinemate.core.raiting.dto.UpdateRatingDto;
+import com.fleur.cinemate.core.rating.dto.CreateRatingDto;
+import com.fleur.cinemate.core.rating.dto.RatingDto;
+import com.fleur.cinemate.core.rating.dto.UpdateRatingDto;
 import com.fleur.cinemate.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
