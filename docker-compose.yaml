@@ -8,12 +8,19 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - elasticsearch
     environment:
         - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cinemate
         - SPRING_DATASOURCE_USERNAME=postgres
         - SPRING_DATASOURCE_PASSWORD=root
+        - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
     networks:
       - app-network
+    command: >
+      sh -c "until curl -s http://elasticsearch:9200; do echo 'Waiting for Elasticsearch...'; sleep 2; done;
+             until pg_isready -h db -p 5432; do echo 'Waiting for PostgreSQL...'; sleep 2; done;
+             java -jar /app/app.jar"
+
 
   db:
     image: postgres:17
@@ -27,6 +34,29 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  elasticsearch:
+    image: elasticsearch:8.11.1
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -s http://localhost:9200 >/dev/null" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app-network:
@@ -34,3 +64,4 @@ networks:
 
 volumes:
   pgdata:
+  es-data:
