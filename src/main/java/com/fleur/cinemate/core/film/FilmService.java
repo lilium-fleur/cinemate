@@ -4,18 +4,20 @@ package com.fleur.cinemate.core.film;
 import com.fleur.cinemate.core.film.dto.CreateFilmDto;
 import com.fleur.cinemate.core.film.dto.FilmDto;
 import com.fleur.cinemate.core.film.dto.UpdateFilmDto;
-import com.fleur.cinemate.core.ralations.filmActor.FilmActor;
-import com.fleur.cinemate.core.ralations.filmActor.FilmActorRepository;
-import com.fleur.cinemate.core.ralations.filmGenre.FilmGenre;
-import com.fleur.cinemate.core.ralations.filmGenre.FilmGenreRepository;
+import com.fleur.cinemate.core.relations.filmActor.FilmActor;
+import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
+import com.fleur.cinemate.core.relations.filmGenre.FilmGenre;
+import com.fleur.cinemate.core.relations.filmGenre.FilmGenreRepository;
+import com.fleur.cinemate.search.repository.FilmDocumentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class FilmService {
@@ -24,6 +26,7 @@ public class FilmService {
     private final FilmMapper filmMapper;
     private final FilmActorRepository filmActorRepository;
     private final FilmGenreRepository filmGenreRepository;
+    private final FilmDocumentRepository filmDocumentRepository;
 
 
     @Transactional
@@ -47,8 +50,13 @@ public class FilmService {
     public void deleteFilm(Long filmId){
         Film film = filmRepository.findById(filmId)
                 .orElseThrow(() -> new EntityNotFoundException("Film not found"));
-
         filmRepository.delete(film);
+
+        try {
+            filmDocumentRepository.deleteById(film.getId());
+        } catch (Exception e) {
+            log.warn("Error deleting from elastic-index film with id:{}", filmId);
+        }
     }
 
     @Transactional(readOnly = true)

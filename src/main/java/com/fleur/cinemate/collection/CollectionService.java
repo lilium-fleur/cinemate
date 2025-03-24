@@ -1,23 +1,27 @@
-package com.fleur.cinemate.userCollection.collection.collection;
+package com.fleur.cinemate.collection;
 
+import com.fleur.cinemate.search.repository.CollectionDocumentRepository;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.collection.collection.dto.CreateCollectionDto;
-import com.fleur.cinemate.userCollection.collection.collection.dto.CollectionDto;
-import com.fleur.cinemate.userCollection.collection.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.collection.dto.CreateCollectionDto;
+import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class CollectionService {
 
     private final CollectionRepository collectionRepository;
     private final CollectionMapper collectionMapper;
+    private final CollectionDocumentRepository collectionDocumentRepository;
 
     @Transactional
     public CollectionDto createCollection(
@@ -47,6 +51,18 @@ public class CollectionService {
     public void deleteCollection(Long filmCollectionId, User user) {
         Collection collection = getOrThrowException(filmCollectionId, user);
         collectionRepository.delete(collection);
+
+        try {
+            collectionDocumentRepository.deleteById(collection.getId());
+        } catch (Exception e) {
+            log.warn("Error deleting from elastic-index collection with id:{}", filmCollectionId);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Collection findPublicCollectionById(Long collectionId){
+        return collectionRepository.findPublicById(collectionId)
+                .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
     }
 
     @Transactional(readOnly = true)
