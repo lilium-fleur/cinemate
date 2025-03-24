@@ -1,10 +1,10 @@
-package com.fleur.cinemate.core.raiting.dto;
+package com.fleur.cinemate.core.rating.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public record UpdateRatingDto(
+public record CreateRatingDto(
         @NotNull
         Long filmId,
         @Min(0)

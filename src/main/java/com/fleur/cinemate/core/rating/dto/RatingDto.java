@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.raiting.dto;
+package com.fleur.cinemate.core.rating.dto;
 
 import java.time.Instant;
 

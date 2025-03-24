@@ -1,11 +1,11 @@
-package com.fleur.cinemate.core.raiting;
+package com.fleur.cinemate.core.rating;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
-import com.fleur.cinemate.core.raiting.dto.CreateRatingDto;
-import com.fleur.cinemate.core.raiting.dto.RatingDto;
-import com.fleur.cinemate.core.raiting.dto.UpdateRatingDto;
+import com.fleur.cinemate.core.rating.dto.CreateRatingDto;
+import com.fleur.cinemate.core.rating.dto.RatingDto;
+import com.fleur.cinemate.core.rating.dto.UpdateRatingDto;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
