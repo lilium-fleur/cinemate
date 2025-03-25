@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -76,6 +78,13 @@ public class FilmService {
     @Transactional(readOnly = true)
     public Page<FilmDto> findAllFilms(Pageable pageable){
         return filmRepository.findAll(pageable).map(filmMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FilmDto> findAllFilmsById(List<Long> ids){
+        return filmRepository.findAllById(ids).stream()
+                .map(filmMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)

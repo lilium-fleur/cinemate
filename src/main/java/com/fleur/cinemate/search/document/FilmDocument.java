@@ -30,6 +30,9 @@ public class FilmDocument {
     @Field(type = FieldType.Integer)
     private Integer releaseYear;
 
+    @Field(type = FieldType.Keyword)
+    private Double rating;
+
     @Field(type = FieldType.Keyword, normalizer = "lowercase")
     @Builder.Default
     private Set<String> genres = new HashSet<>();

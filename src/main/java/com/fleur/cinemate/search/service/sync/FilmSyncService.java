@@ -75,6 +75,7 @@ public class FilmSyncService {
                 .title(film.getTitle())
                 .description(film.getDescription())
                 .releaseYear(film.getReleaseYear())
+                .rating(film.getSourceRating())
                 .actors(filmActorNames)
                 .actorsSearch(filmActorNames)
                 .genres(filmGenreNames)

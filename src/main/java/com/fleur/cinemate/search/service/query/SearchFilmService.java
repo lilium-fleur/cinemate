@@ -1,0 +1,126 @@
+package com.fleur.cinemate.search.service.query;
+
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import com.fleur.cinemate.core.film.FilmService;
+import com.fleur.cinemate.core.film.dto.FilmDto;
+import com.fleur.cinemate.search.document.FilmDocument;
+import com.fleur.cinemate.search.dto.FilmSearchFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+@RequiredArgsConstructor
+@Service
+public class SearchFilmService {
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final FilmService filmService;
+
+
+    public Page<FilmDto> findByFilters(FilmSearchFilter filter, Pageable pageable) {
+        List<Query> filters = new ArrayList<>();
+        Query searchQuery;
+
+        if(filter.query() != null && !filter.query().trim().isEmpty()) {
+            searchQuery = MultiMatchQuery.of(m -> m
+                            .query(filter.query())
+                            .fields("title^4", "description^2", "genresSearch^1", "actorsSearch^1")
+                            .fuzziness("AUTO")
+                            .prefixLength(1))
+                    ._toQuery();
+            filters.add(searchQuery);
+        }else {
+            searchQuery = MatchAllQuery.of(m -> m)._toQuery();
+        }
+
+        if(filter.genres() != null && filter.genres().isEmpty()){
+            Query genresFilter = TermsQuery.of(t -> t
+                    .field("genres")
+                    .terms(term -> term.value(filter.genres().stream()
+                            .map(FieldValue::of)
+                            .toList())))
+                    ._toQuery();
+            filters.add(genresFilter);
+        }
+
+        if(filter.minRating() != null || filter.maxRating() != null){
+            Query ratingFilter = RangeQuery.of(r -> r.term(term -> term
+                    .field("rating")
+                    .gte(filter.minRating() != null ? filter.minRating().toString() : null)
+                    .lte(filter.maxRating() != null ? filter.maxRating().toString() : null)))
+                    ._toQuery();
+            filters.add(ratingFilter);
+        }
+
+        if(filter.minYear() != null || filter.maxYear() != null){
+            Query yearFilter = RangeQuery.of(r -> r.term(term -> term
+                    .field("releaseYear")
+                    .gte(filter.minYear() != null ? filter.minYear().toString() : null)
+                    .lte(filter.maxYear() != null ? filter.maxYear().toString() : null)))
+                    ._toQuery();
+            filters.add(yearFilter);
+        }
+
+        Query scoredQuery = FunctionScoreQuery.of(f -> f
+                .query(searchQuery)
+                .functions(FunctionScore.of(fs -> fs
+                        .fieldValueFactor(FieldValueFactorScoreFunction.of(fvf -> fvf
+                                .field("rating")
+                                .factor(1.2)
+                                .modifier(FieldValueFactorModifier.Log1p))))))
+                ._toQuery();
+
+
+        NativeQuery nativeQuery = NativeQuery.builder()
+                .withQuery(q -> q.bool(bool -> bool
+                        .must(scoredQuery)
+                        .filter(filters)))
+                .withPageable(pageable)
+                .build();
+
+        return searchAndMap(nativeQuery, pageable);
+    }
+
+
+    private Page<FilmDto> searchAndMap(NativeQuery nativeQuery, Pageable pageable) {
+        //достаем из индекса
+        SearchHits<FilmDocument> hits = elasticsearchOperations.search(
+                nativeQuery, FilmDocument.class, IndexCoordinates.of("films"));
+
+        //для отладки
+        hits.forEach(hit -> System.out.println("Score: " + hit.getScore() + ", Movie: " + hit.getContent().getTitle()));
+
+        //достаем айдишники найденых фильмов
+        List<Long> filmIds = hits.stream()
+                .map(hit -> hit.getContent().getId())
+                .toList();
+
+        //создаем мапу с фильмами и их айди
+        Map<Long, FilmDto> filmsMap = filmService.findAllFilmsById(filmIds).stream()
+                .collect(Collectors.toMap(FilmDto::id, film -> film));
+
+        //устанавливаем тот же порядок что и при выдаче
+        List<FilmDto> result = filmIds.stream()
+                .map(filmsMap::get)
+                .toList();
+
+        //возвращаем страницу с списком фильмов, параметрами страницы, общим количеством результатов
+        return new PageImpl<>(
+                result,
+                pageable,
+                hits.getTotalHits());
+
+    }
+}

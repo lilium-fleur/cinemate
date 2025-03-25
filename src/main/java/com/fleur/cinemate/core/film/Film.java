@@ -26,6 +26,7 @@ public class Film extends BaseEntity {
     private String ageRating;
     private String trailerUrl;
     private String posterUrl;
+    private Double sourceRating;
 
     @Enumerated(EnumType.STRING)
     private FilmStatus status;
