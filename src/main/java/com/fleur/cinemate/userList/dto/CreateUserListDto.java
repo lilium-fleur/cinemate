@@ -1,4 +1,4 @@
-package com.fleur.cinemate.userCollection.userList.dto;
+package com.fleur.cinemate.userList.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

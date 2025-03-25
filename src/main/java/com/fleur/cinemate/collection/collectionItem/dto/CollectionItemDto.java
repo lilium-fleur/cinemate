@@ -1,4 +1,4 @@
-package com.fleur.cinemate.userCollection.collection.collectionItem.dto;
+package com.fleur.cinemate.collection.collectionItem.dto;
 
 import java.time.Instant;
 

@@ -1,8 +1,8 @@
-package com.fleur.cinemate.userCollection.collection.collection;
+package com.fleur.cinemate.collection;
 
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.collection.collection.dto.CollectionDto;
-import com.fleur.cinemate.userCollection.collection.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

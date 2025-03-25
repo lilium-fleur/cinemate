@@ -1,8 +1,9 @@
-package com.fleur.cinemate.userCollection.userList;
+package com.fleur.cinemate.collection.collectionItem;
+
 
 import com.fleur.cinemate.__shared.model.IdEntity;
 import com.fleur.cinemate.core.film.Film;
-import com.fleur.cinemate.user.User;
+import com.fleur.cinemate.collection.Collection;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -10,32 +11,30 @@ import lombok.experimental.SuperBuilder;
 import java.time.Instant;
 
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @Data
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-@Table(
-        name = "user_lists",
-        uniqueConstraints = @UniqueConstraint(
-                columnNames = {"film_id", "type"}
-        )
-)
+@AllArgsConstructor
 @Entity
-public class UserList extends IdEntity {
+@Table(
+        name = "collection_items",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"collection_id", "film_id"}
+        ))
+public class CollectionItem extends IdEntity {
 
+    @JoinColumn(name = "collection_id", nullable = false)
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Collection collection;
 
-    @ManyToOne
     @JoinColumn(name = "film_id", nullable = false)
+    @ManyToOne
     private Film film;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserListType type;
 
     @Column(nullable = false)
     @Builder.Default
     private Instant addedAt = Instant.now();
+
+    @Column(nullable = false)
+    private Integer position;
 }

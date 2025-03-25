@@ -1,11 +1,11 @@
-package com.fleur.cinemate.userCollection.userList;
+package com.fleur.cinemate.userList;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.userList.dto.CreateUserListDto;
-import com.fleur.cinemate.userCollection.userList.dto.UserListDto;
+import com.fleur.cinemate.userList.dto.CreateUserListDto;
+import com.fleur.cinemate.userList.dto.UserListDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

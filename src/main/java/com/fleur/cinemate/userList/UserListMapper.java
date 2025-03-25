@@ -1,9 +1,9 @@
-package com.fleur.cinemate.userCollection.userList;
+package com.fleur.cinemate.userList;
 
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.userList.dto.CreateUserListDto;
-import com.fleur.cinemate.userCollection.userList.dto.UserListDto;
+import com.fleur.cinemate.userList.dto.CreateUserListDto;
+import com.fleur.cinemate.userList.dto.UserListDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

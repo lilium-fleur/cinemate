@@ -1,6 +1,6 @@
-package com.fleur.cinemate.userCollection.collection.collectionItem;
+package com.fleur.cinemate.collection.collectionItem;
 
-import com.fleur.cinemate.userCollection.collection.collection.Collection;
+import com.fleur.cinemate.collection.Collection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

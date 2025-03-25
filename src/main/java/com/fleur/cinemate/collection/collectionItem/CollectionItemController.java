@@ -1,8 +1,8 @@
-package com.fleur.cinemate.userCollection.collection.collectionItem;
+package com.fleur.cinemate.collection.collectionItem;
 
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.userCollection.collection.collectionItem.dto.CreateCollectionItemDto;
-import com.fleur.cinemate.userCollection.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
+import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

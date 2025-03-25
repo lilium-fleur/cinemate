@@ -1,4 +1,4 @@
-package com.fleur.cinemate.userCollection.userList;
+package com.fleur.cinemate.userList;
 
 public enum UserListType {
     WATCHED,

@@ -1,4 +1,4 @@
-package com.fleur.cinemate.userCollection.userList;
+package com.fleur.cinemate.userList;
 
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
