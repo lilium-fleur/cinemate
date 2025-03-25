@@ -2,7 +2,7 @@ package com.fleur.cinemate.auth.jwt;
 
 import com.fleur.cinemate.auth.token.access.AccessTokenService;
 import com.fleur.cinemate.user.CustomUserDetails;
-import com.fleur.cinemate.user.usersession.UserSessionService;
+import com.fleur.cinemate.user.session.UserSessionService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

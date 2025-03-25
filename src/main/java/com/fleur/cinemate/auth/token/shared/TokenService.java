@@ -3,7 +3,7 @@ package com.fleur.cinemate.auth.token.shared;
 
 import com.fleur.cinemate.auth.dto.CreateTokenDto;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.user.usersession.UserSession;
+import com.fleur.cinemate.user.session.UserSession;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
