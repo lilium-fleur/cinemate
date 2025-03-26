@@ -1,0 +1,8 @@
+{
+  "properties": {
+    "suggest": {
+      "type": "completion",
+      "analyzer": "standard"
+    }
+  }
+}

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.suggest.Completion;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -80,6 +81,7 @@ public class FilmSyncService {
                 .description(film.getDescription())
                 .releaseYear(film.getReleaseYear())
                 .rating(film.getSourceRating())
+                .suggest(new Completion(new String[]{film.getTitle()}))
                 .actors(filmActorNames)
                 .actorsSearch(String.join(" ", filmActorNames))
                 .genres(filmGenreNames)
