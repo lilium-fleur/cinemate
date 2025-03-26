@@ -14,6 +14,7 @@ public record FilmDto(
         String ageRating,
         String trailerUrl,
         String posterUrl,
+        Double sourceRating,
         String status,
         Instant createdAt,
         Instant lastModifiedAt

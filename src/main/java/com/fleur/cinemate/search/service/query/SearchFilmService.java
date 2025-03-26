@@ -2,6 +2,7 @@ package com.fleur.cinemate.search.service.query;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.json.JsonData;
 import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.core.film.dto.FilmDto;
 import com.fleur.cinemate.search.document.FilmDocument;
@@ -30,56 +31,57 @@ public class SearchFilmService {
 
 
     public Page<FilmDto> findByFilters(FilmSearchFilter filter, Pageable pageable) {
+        System.out.println(filter.query());
         List<Query> filters = new ArrayList<>();
         Query searchQuery;
 
-        if(filter.query() != null && !filter.query().trim().isEmpty()) {
+        if (filter.query() != null && !filter.query().trim().isEmpty()) {
             searchQuery = MultiMatchQuery.of(m -> m
                             .query(filter.query())
-                            .fields("title^4", "description^2", "genresSearch^1", "actorsSearch^1")
+                            .fields("title^4", "description^2", "genres_search^3", "actors_search^3")
                             .fuzziness("AUTO")
                             .prefixLength(1))
                     ._toQuery();
             filters.add(searchQuery);
-        }else {
+        } else {
             searchQuery = MatchAllQuery.of(m -> m)._toQuery();
         }
 
-        if(filter.genres() != null && filter.genres().isEmpty()){
+        if (filter.genres() != null &&  !filter.genres().isEmpty()) {
             Query genresFilter = TermsQuery.of(t -> t
-                    .field("genres")
-                    .terms(term -> term.value(filter.genres().stream()
-                            .map(FieldValue::of)
-                            .toList())))
+                            .field("genres")
+                            .terms(term -> term.value(filter.genres().stream()
+                                    .map(FieldValue::of)
+                                    .toList())))
                     ._toQuery();
             filters.add(genresFilter);
         }
 
-        if(filter.minRating() != null || filter.maxRating() != null){
-            Query ratingFilter = RangeQuery.of(r -> r.term(term -> term
-                    .field("rating")
-                    .gte(filter.minRating() != null ? filter.minRating().toString() : null)
-                    .lte(filter.maxRating() != null ? filter.maxRating().toString() : null)))
+        if (filter.minRating() != null || filter.maxRating() != null) {
+            Query ratingFilter = RangeQuery.of(r -> r.number(num -> num
+                            .field("rating")
+                            .gte(filter.minRating() != null ? filter.minRating() : null)
+                            .lte(filter.maxRating() != null ? filter.maxRating() : null)))
                     ._toQuery();
             filters.add(ratingFilter);
         }
 
-        if(filter.minYear() != null || filter.maxYear() != null){
-            Query yearFilter = RangeQuery.of(r -> r.term(term -> term
-                    .field("releaseYear")
-                    .gte(filter.minYear() != null ? filter.minYear().toString() : null)
-                    .lte(filter.maxYear() != null ? filter.maxYear().toString() : null)))
+        if (filter.minYear() != null || filter.maxYear() != null) {
+            Query yearFilter = RangeQuery.of(r -> r.number(num -> num
+                            .field("releaseYear")
+                            .gte(filter.minYear() != null ? filter.minYear().doubleValue() : null)
+                            .lte(filter.maxYear() != null ? filter.maxYear().doubleValue() : null)))
                     ._toQuery();
             filters.add(yearFilter);
         }
 
         Query scoredQuery = FunctionScoreQuery.of(f -> f
-                .query(searchQuery)
-                .functions(FunctionScore.of(fs -> fs
-                        .fieldValueFactor(FieldValueFactorScoreFunction.of(fvf -> fvf
-                                .field("rating")
-                                .factor(1.2)
-                                .modifier(FieldValueFactorModifier.Log1p))))))
+                        .query(searchQuery)
+                        .functions(FunctionScore.of(fs -> fs
+                                .fieldValueFactor(FieldValueFactorScoreFunction.of(fvf -> fvf
+                                        .field("rating")
+                                        .factor(1.2)
+                                        .modifier(FieldValueFactorModifier.Log1p))))))
                 ._toQuery();
 
 

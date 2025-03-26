@@ -12,6 +12,7 @@ public record CreateFilmDto(
         String ageRating,
         String trailerUrl,
         String posterUrl,
+        Double sourceRating,
         String status
 ) {
 }

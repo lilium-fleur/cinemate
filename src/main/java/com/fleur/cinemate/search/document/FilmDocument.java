@@ -30,7 +30,7 @@ public class FilmDocument {
     @Field(type = FieldType.Integer)
     private Integer releaseYear;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Double)
     private Double rating;
 
     @Field(type = FieldType.Keyword, normalizer = "lowercase")
@@ -42,9 +42,9 @@ public class FilmDocument {
     private Set<String> actors = new HashSet<>();
 
     @Field(type = FieldType.Text, name = "genres_search", analyzer = "english")
-    private Set<String> genresSearch;
+    private String genresSearch;
 
     @Field(type = FieldType.Text, name = "actors_search", analyzer = "english")
-    private Set<String> actorsSearch;
+    private String actorsSearch;
 
 }

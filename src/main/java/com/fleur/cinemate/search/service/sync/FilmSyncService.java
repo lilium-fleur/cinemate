@@ -65,7 +65,11 @@ public class FilmSyncService {
                     .map(ActorDto::name)
                     .toSet();
 
-            filmDocumentRepository.save(convertToFilmDocument(film, genres, actors));
+            try {
+                filmDocumentRepository.save(convertToFilmDocument(film, genres, actors));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -77,9 +81,9 @@ public class FilmSyncService {
                 .releaseYear(film.getReleaseYear())
                 .rating(film.getSourceRating())
                 .actors(filmActorNames)
-                .actorsSearch(filmActorNames)
+                .actorsSearch(String.join(" ", filmActorNames))
                 .genres(filmGenreNames)
-                .genresSearch(filmGenreNames)
+                .genresSearch(String.join(" ", filmGenreNames))
                 .build();
     }
 

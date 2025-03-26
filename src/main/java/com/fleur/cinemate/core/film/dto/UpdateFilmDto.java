@@ -7,6 +7,7 @@ public record UpdateFilmDto(
         Integer duration,
         String ageRating,
         String trailerUrl,
+        Double sourceRating,
         String posterUrl,
         String status
 ) {
