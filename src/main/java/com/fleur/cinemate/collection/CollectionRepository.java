@@ -1,6 +1,5 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
