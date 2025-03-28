@@ -15,11 +15,11 @@ import java.time.Instant;
 
 @Log4j2
 @Service
-public class ActorSyncService extends SyncService<Actor> {
+public class SyncActorService extends SyncService<Actor> {
     private final ActorDocumentRepository actorDocumentRepository;
     private final ActorService actorService;
 
-    public ActorSyncService(ESSyncDateRepository esSyncDateRepository,
+    public SyncActorService(ESSyncDateRepository esSyncDateRepository,
                             ActorDocumentRepository actorDocumentRepository,
                             ActorService actorService) {
         super(esSyncDateRepository);

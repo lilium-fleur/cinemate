@@ -34,7 +34,7 @@ public class SearchFilmService {
     private final Integer SIZE_OF_SUGGESTIONS = 4;
 
 
-    public Page<FilmDto> findByFilters(FilmSearchFilter filter, Pageable pageable) {
+    public Page<FilmDto> findFilmsByFilters(FilmSearchFilter filter, Pageable pageable) {
         System.out.println(filter.query());
         List<Query> filters = new ArrayList<>();
         Query searchQuery;
@@ -99,7 +99,7 @@ public class SearchFilmService {
         return searchAndMap(nativeQuery, pageable);
     }
 
-    public List<String> findSuggestions(String prefix) {
+    public List<String> findSuggest(String prefix) {
         if (prefix == null || prefix.trim().isEmpty()) {
             return new ArrayList<>();
         }

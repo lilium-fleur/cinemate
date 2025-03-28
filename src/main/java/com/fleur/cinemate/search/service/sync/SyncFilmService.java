@@ -22,14 +22,14 @@ import java.util.Set;
 
 @Log4j2
 @Service
-public class FilmSyncService extends SyncService<Film> {
+public class SyncFilmService extends SyncService<Film> {
 
     private final FilmDocumentRepository filmDocumentRepository;
     private final GenreService genreService;
     private final ActorService actorService;
     private final FilmService filmService;
 
-    public FilmSyncService(ESSyncDateRepository esSyncDateRepository,
+    public SyncFilmService(ESSyncDateRepository esSyncDateRepository,
                            FilmDocumentRepository filmDocumentRepository,
                            GenreService genreService,
                            ActorService actorService,

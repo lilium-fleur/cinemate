@@ -25,7 +25,7 @@ public class SearchCollectionService {
     private final CollectionService collectionService;
     private final ElasticsearchOperations elasticsearchOperations;
 
-    public Page<CollectionDto> findByQuery(String query, Pageable pageable) {
+    public Page<CollectionDto> findCollectionsByQuery(String query, Pageable pageable) {
         Query searchQuery;
 
         if (query != null && !query.trim().isEmpty()) {

@@ -26,7 +26,7 @@ public class SearchActorService {
     private final ElasticsearchOperations elasticsearchOperations;
 
 
-    public Page<ActorDto> findByQuery(String query, Pageable pageable) {
+    public Page<ActorDto> findActorsByQuery(String query, Pageable pageable) {
         Query searchQuery;
 
         if(query != null && !query.isBlank()){
