@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -109,6 +110,14 @@ public class CollectionItemService {
 
         return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable)
                 .map(collectionItemMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> findFilmIdsByCollection(
+            Long collectionId){
+        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, Pageable.unpaged())
+                .map(collectionItem -> collectionItem.getFilm().getId())
+                .toList();
     }
 
 
