@@ -23,3 +23,5 @@ databaseChangeLog:
       file: db/changelog/changes/11-create-film-collection-items.sql
   - include:
       file: db/changelog/changes/12-create-ratings.sql
+  - include:
+      file: db/changelog/changes/13-es-sync-dates.sql

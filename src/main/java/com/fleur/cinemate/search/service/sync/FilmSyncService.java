@@ -3,17 +3,15 @@ package com.fleur.cinemate.search.service.sync;
 import com.fleur.cinemate.core.actor.ActorService;
 import com.fleur.cinemate.core.actor.dto.ActorDto;
 import com.fleur.cinemate.core.film.Film;
-import com.fleur.cinemate.core.film.FilmRepository;
+import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.core.genre.GenreService;
 import com.fleur.cinemate.core.genre.dto.GenreDto;
 import com.fleur.cinemate.search.document.FilmDocument;
-import com.fleur.cinemate.search.entity.ESSyncDate;
 import com.fleur.cinemate.search.entity.IndexName;
 import com.fleur.cinemate.search.repository.ESSyncDateRepository;
 import com.fleur.cinemate.search.repository.FilmDocumentRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.suggest.Completion;
 import org.springframework.stereotype.Service;
@@ -21,43 +19,30 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Set;
 
-@RequiredArgsConstructor
-@Service
-public class FilmSyncService {
 
-    private final FilmRepository filmRepository;
+@Log4j2
+@Service
+public class FilmSyncService extends SyncService<Film> {
+
     private final FilmDocumentRepository filmDocumentRepository;
     private final GenreService genreService;
     private final ActorService actorService;
-    private final ESSyncDateRepository esSyncDateRepository;
+    private final FilmService filmService;
 
-    public void syncAllFilms() {
-        int page = 0;
-        int size = 100;
-        Page<Film> filmPage;
-        do {
-            filmPage = filmRepository.findAll(PageRequest.of(page, size));
-            saveFilms(filmPage);
-            page++;
-        } while (filmPage.hasNext());
+    public FilmSyncService(ESSyncDateRepository esSyncDateRepository,
+                           FilmDocumentRepository filmDocumentRepository,
+                           GenreService genreService,
+                           ActorService actorService,
+                           FilmService filmService) {
+        super(esSyncDateRepository);
+        this.filmDocumentRepository = filmDocumentRepository;
+        this.genreService = genreService;
+        this.actorService = actorService;
+        this.filmService = filmService;
     }
 
-    public void incrementalSyncFilms(){
-        int page = 0;
-        int size = 100;
-        Instant lastSyncTime = esSyncDateRepository.findFirstByIndexNameOrderByLastSyncTime(IndexName.FILMS)
-                .map(ESSyncDate::getLastSyncTime)
-                .orElse(Instant.EPOCH);
-        Page<Film> filmPage;
-        do {
-            filmPage = filmRepository.findModifiedSince(lastSyncTime, PageRequest.of(page, size));
-            saveFilms(filmPage);
-            page++;
-        } while (filmPage.hasNext());
-    }
-
-
-    private void saveFilms(Page<Film> filmPage) {
+    @Override
+    protected void saveToIndex(Page<Film> filmPage) {
         for (Film film : filmPage) {
             Set<String> genres = genreService.findGenresByFilm(film.getId(), Pageable.unpaged())
                     .map(GenreDto::name)
@@ -65,16 +50,32 @@ public class FilmSyncService {
             Set<String> actors = actorService.findActorsByFilm(film.getId(), Pageable.unpaged())
                     .map(ActorDto::name)
                     .toSet();
-
             try {
-                filmDocumentRepository.save(convertToFilmDocument(film, genres, actors));
+                filmDocumentRepository.save(convertToDocument(film, genres, actors));
             } catch (Exception e) {
+                log.error("Error saving film document with id {} to index: {}",
+                        film.getId(), e.getMessage());
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private FilmDocument convertToFilmDocument(Film film, Set<String> filmGenreNames, Set<String> filmActorNames) {
+    @Override
+    protected Page<Film> findEntitiesSinceDate(Instant sinceDate, Pageable pageable) {
+        return filmService.findModifiedSince(sinceDate, pageable);
+    }
+
+    @Override
+    protected Page<Film> findAllEntities(Pageable pageable) {
+        return filmService.findAllFilmEntities(pageable);
+    }
+
+    @Override
+    protected IndexName getIndexName() {
+        return IndexName.FILMS;
+    }
+
+    private FilmDocument convertToDocument(Film film, Set<String> filmGenreNames, Set<String> filmActorNames) {
         return FilmDocument.builder()
                 .id(film.getId())
                 .title(film.getTitle())

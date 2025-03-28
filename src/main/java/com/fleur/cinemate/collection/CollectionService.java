@@ -14,6 +14,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
+
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -60,10 +63,28 @@ public class CollectionService {
     }
 
     @Transactional(readOnly = true)
+    public List<CollectionDto> findAllCollectionById(List<Long> ids){
+        return collectionRepository.findAllById(ids).stream()
+                .map(collectionMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Collection> findAllCollection(Pageable pageable){
+        return collectionRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Collection> findModifiedSince(Instant since, Pageable pageable){
+        return collectionRepository.findModifiedSince(since, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Collection findPublicCollectionById(Long collectionId){
         return collectionRepository.findPublicById(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
     }
+
 
     @Transactional(readOnly = true)
     public CollectionDto findCollectionById(Long filmCollectionId, User currentUser) {

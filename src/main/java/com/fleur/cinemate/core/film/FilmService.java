@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Log4j2
@@ -78,6 +79,16 @@ public class FilmService {
     @Transactional(readOnly = true)
     public Page<FilmDto> findAllFilms(Pageable pageable){
         return filmRepository.findAll(pageable).map(filmMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Film> findAllFilmEntities(Pageable pageable){
+        return filmRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Film> findModifiedSince(Instant since, Pageable pageable){
+        return filmRepository.findModifiedSince(since, pageable);
     }
 
     @Transactional(readOnly = true)

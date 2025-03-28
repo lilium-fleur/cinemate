@@ -14,6 +14,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
+
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -68,6 +71,23 @@ public class ActorService {
         } catch (Exception e) {
             log.warn("Error deleting from elastic-index actor with id:{}", actorId);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ActorDto> findAllActorsById(List<Long> ids){
+        return actorRepository.findAllById(ids).stream()
+                .map(actorMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Actor> findAllActorsEntities(Pageable pageable){
+        return actorRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Actor> findModifiedSince(Instant since, Pageable pageable){
+        return actorRepository.findModifiedSince(since, pageable);
     }
 
     @Transactional(readOnly = true)

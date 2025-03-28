@@ -1,68 +1,65 @@
 package com.fleur.cinemate.search.service.sync;
 
 import com.fleur.cinemate.collection.Collection;
-import com.fleur.cinemate.collection.CollectionRepository;
-import com.fleur.cinemate.collection.collectionItem.CollectionItemService;
+import com.fleur.cinemate.collection.CollectionService;
 import com.fleur.cinemate.search.document.CollectionDocument;
-import com.fleur.cinemate.search.entity.ESSyncDate;
 import com.fleur.cinemate.search.entity.IndexName;
 import com.fleur.cinemate.search.repository.CollectionDocumentRepository;
 import com.fleur.cinemate.search.repository.ESSyncDateRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
-@RequiredArgsConstructor
+@Log4j2
 @Service
-public class CollectionSyncService {
-    private final CollectionRepository collectionRepository;
+public class CollectionSyncService extends SyncService<Collection> {
     private final CollectionDocumentRepository collectionDocumentRepository;
-    private final ESSyncDateRepository esSyncDateRepository;
-    private final CollectionItemService collectionItemService;
+    private final CollectionService collectionService;
 
-
-    public void syncAllCollections() {
-        int page = 0;
-        int size = 100;
-        Page<Collection> collectionPage;
-        do{
-            collectionPage = collectionRepository.findAll(PageRequest.of(page, size));
-            for(Collection collection : collectionPage){
-                List<Long> itemIds = collectionItemService.findFilmIdsByCollection(collection.getId());
-                collectionDocumentRepository.save(convertToCollectionDocument(collection, itemIds));
-            }
-            page++;
-        }while(collectionPage.hasNext());
+    public CollectionSyncService(ESSyncDateRepository esSyncDateRepository,
+                                 CollectionDocumentRepository collectionDocumentRepository,
+                                 CollectionService collectionService) {
+        super(esSyncDateRepository);
+        this.collectionDocumentRepository = collectionDocumentRepository;
+        this.collectionService = collectionService;
     }
 
-    public void incrementalSyncCollections() {
-        int page = 0;
-        int size = 100;
-        Page<Collection> collectionPage;
-        Instant lastSyncTime = esSyncDateRepository.findFirstByIndexNameOrderByLastSyncTime(IndexName.COLLECTIONS)
-                .map(ESSyncDate::getLastSyncTime)
-                .orElse(Instant.EPOCH);
-        do{
-            collectionPage = collectionRepository.findModifiedSince(lastSyncTime, PageRequest.of(page, size));
-            for(Collection collection : collectionPage){
-                List<Long> itemIds = collectionItemService.findFilmIdsByCollection(collection.getId());
-                collectionDocumentRepository.save(convertToCollectionDocument(collection, itemIds));
-            }
-            page++;
-        }while(collectionPage.hasNext());
+    @Override
+    protected IndexName getIndexName() {
+        return IndexName.COLLECTIONS;
     }
 
-    public CollectionDocument convertToCollectionDocument(Collection collection, List<Long> itemIds){
+    @Override
+    protected Page<Collection> findAllEntities(Pageable pageable) {
+        return collectionService.findAllCollection(pageable);
+    }
+
+    @Override
+    protected Page<Collection> findEntitiesSinceDate(Instant sinceDate, Pageable pageable) {
+        return collectionService.findModifiedSince(sinceDate, pageable);
+    }
+
+    @Override
+    protected void saveToIndex(Page<Collection> entityPage) {
+        for (Collection collection : entityPage) {
+            try {
+                collectionDocumentRepository.save(convertToDocument(collection));
+            } catch (Exception e) {
+                log.error("Error saving collection document with id: {} to index: {}",
+                        collection.getId(), e.getMessage());
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public CollectionDocument convertToDocument(Collection collection) {
         return CollectionDocument.builder()
                 .id(collection.getId())
-                .userId(collection.getUser().getId())
                 .name(collection.getName())
                 .description(collection.getDescription())
-                .filmIds(itemIds)
                 .build();
     }
 }
