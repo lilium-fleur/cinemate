@@ -6,6 +6,7 @@ import com.fleur.cinemate.core.actor.dto.UpdateActorDto;
 import com.fleur.cinemate.core.relations.filmActor.FilmActor;
 import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
 import com.fleur.cinemate.event.RecordDeletedEvent;
+import com.fleur.cinemate.search.repository.ActorDocumentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
