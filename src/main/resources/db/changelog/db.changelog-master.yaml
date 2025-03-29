@@ -25,3 +25,5 @@ databaseChangeLog:
       file: db/changelog/changes/12-create-ratings.sql
   - include:
       file: db/changelog/changes/13-es-sync-dates.sql
+  - include:
+      file: db/changelog/changes/14-create-pending-delete.sql

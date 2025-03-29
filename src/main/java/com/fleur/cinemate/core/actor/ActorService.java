@@ -5,10 +5,11 @@ import com.fleur.cinemate.core.actor.dto.CreateActorDto;
 import com.fleur.cinemate.core.actor.dto.UpdateActorDto;
 import com.fleur.cinemate.core.relations.filmActor.FilmActor;
 import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
-import com.fleur.cinemate.search.repository.ActorDocumentRepository;
+import com.fleur.cinemate.event.RecordDeletedEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,7 @@ public class ActorService {
     private final ActorRepository actorRepository;
     private final ActorMapper actorMapper;
     private final FilmActorRepository filmActorRepository;
-    private final ActorDocumentRepository actorDocumentRepository;
-
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ActorDto createActor(CreateActorDto createActorDto) {
@@ -65,12 +65,7 @@ public class ActorService {
                 .orElseThrow(() -> new EntityNotFoundException("Actor not found"));
 
         actorRepository.delete(actor);
-
-        try {
-            actorDocumentRepository.deleteById(actor.getId());
-        } catch (Exception e) {
-            log.warn("Error deleting from elastic-index actor with id:{}", actorId);
-        }
+        eventPublisher.publishEvent(new RecordDeletedEvent(this, actorId, "Actor"));
     }
 
     @Transactional(readOnly = true)

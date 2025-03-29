@@ -1,13 +1,14 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.search.repository.CollectionDocumentRepository;
-import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.event.RecordDeletedEvent;
+import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +25,8 @@ public class CollectionService {
 
     private final CollectionRepository collectionRepository;
     private final CollectionMapper collectionMapper;
-    private final CollectionDocumentRepository collectionDocumentRepository;
+    private final ApplicationEventPublisher eventPublisher;
+
 
     @Transactional
     public CollectionDto createCollection(
@@ -51,15 +53,11 @@ public class CollectionService {
     }
 
     @Transactional
-    public void deleteCollection(Long filmCollectionId, User user) {
-        Collection collection = getOrThrowException(filmCollectionId, user);
+    public void deleteCollection(Long collectionId, User user) {
+        Collection collection = getOrThrowException(collectionId, user);
         collectionRepository.delete(collection);
 
-        try {
-            collectionDocumentRepository.deleteById(collection.getId());
-        } catch (Exception e) {
-            log.warn("Error deleting from elastic-index collection with id:{}", filmCollectionId);
-        }
+        eventPublisher.publishEvent(new RecordDeletedEvent(this, collectionId, "Collection"));
     }
 
     @Transactional(readOnly = true)

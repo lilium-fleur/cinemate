@@ -26,3 +26,8 @@ jwt:
     expiration: 60
   refresh:
     expiration: 1440
+
+sync:
+  scheduler:
+    incremental:
+      interval: 300000

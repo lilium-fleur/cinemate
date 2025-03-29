@@ -8,10 +8,11 @@ import com.fleur.cinemate.core.relations.filmActor.FilmActor;
 import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenre;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenreRepository;
-import com.fleur.cinemate.search.repository.FilmDocumentRepository;
+import com.fleur.cinemate.event.RecordDeletedEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,7 @@ public class FilmService {
     private final FilmMapper filmMapper;
     private final FilmActorRepository filmActorRepository;
     private final FilmGenreRepository filmGenreRepository;
-    private final FilmDocumentRepository filmDocumentRepository;
-
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public FilmDto createFilm(CreateFilmDto createFilmDto){
@@ -55,11 +55,7 @@ public class FilmService {
                 .orElseThrow(() -> new EntityNotFoundException("Film not found"));
         filmRepository.delete(film);
 
-        try {
-            filmDocumentRepository.deleteById(film.getId());
-        } catch (Exception e) {
-            log.warn("Error deleting from elastic-index film with id:{}", filmId);
-        }
+        eventPublisher.publishEvent(new RecordDeletedEvent(this, filmId, "Film"));
     }
 
     @Transactional(readOnly = true)
