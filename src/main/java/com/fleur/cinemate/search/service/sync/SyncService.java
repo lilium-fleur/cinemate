@@ -6,11 +6,12 @@ import com.fleur.cinemate.search.repository.ESSyncDateRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
-@Service
+@Component
 public abstract class SyncService<T> {
     private final ESSyncDateRepository esSyncDateRepository;
 
