@@ -9,7 +9,6 @@ import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenre;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenreRepository;
 import com.fleur.cinemate.event.RecordDeletedEvent;
-import com.fleur.cinemate.search.repository.FilmDocumentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

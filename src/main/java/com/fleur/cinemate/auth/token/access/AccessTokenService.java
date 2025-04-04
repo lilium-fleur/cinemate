@@ -1,8 +1,8 @@
 package com.fleur.cinemate.auth.token.access;
 
+import com.fleur.cinemate.auth.dto.CreateTokenDto;
 import com.fleur.cinemate.auth.jwt.JwtTokenUtil;
 import com.fleur.cinemate.auth.token.shared.TokenService;
-import com.fleur.cinemate.auth.dto.CreateTokenDto;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;

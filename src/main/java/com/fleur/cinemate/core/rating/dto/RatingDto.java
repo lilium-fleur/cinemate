@@ -6,7 +6,7 @@ public record RatingDto(
         Long id,
         Long userId,
         Long filmId,
-        Integer score,
+        Double rating,
         Instant createdAt,
         Instant lastModifiedAt
 ) {

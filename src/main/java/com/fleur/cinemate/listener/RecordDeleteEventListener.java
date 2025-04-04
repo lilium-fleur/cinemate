@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Log4j2
 @Component
-public class RecordDeletedEventListener {
+public class RecordDeleteEventListener {
     private final ESDeleteService esDeleteService;
     private final PendingDeleteRepository pendingDeleteRepository;
 
-    public RecordDeletedEventListener(ESDeleteService esDeleteService, PendingDeleteRepository pendingDeleteRepository) {
+    public RecordDeleteEventListener(ESDeleteService esDeleteService, PendingDeleteRepository pendingDeleteRepository) {
         this.esDeleteService = esDeleteService;
         this.pendingDeleteRepository = pendingDeleteRepository;
     }

@@ -1,13 +1,13 @@
 package com.fleur.cinemate.collection.collectionItem;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
+import com.fleur.cinemate.collection.Collection;
+import com.fleur.cinemate.collection.CollectionService;
+import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
 import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.collection.Collection;
-import com.fleur.cinemate.collection.CollectionService;
-import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
-import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

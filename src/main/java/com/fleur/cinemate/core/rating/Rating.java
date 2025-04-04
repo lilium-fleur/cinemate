@@ -33,6 +33,6 @@ public class Rating extends BaseEntity {
     private Film film;
 
     @Column(nullable = false)
-    private Integer score;
+    private Double rating;
 
 }

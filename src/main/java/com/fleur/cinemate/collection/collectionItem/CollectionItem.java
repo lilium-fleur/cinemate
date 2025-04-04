@@ -2,8 +2,8 @@ package com.fleur.cinemate.collection.collectionItem;
 
 
 import com.fleur.cinemate.__shared.model.IdEntity;
-import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.collection.Collection;
+import com.fleur.cinemate.core.film.Film;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

@@ -6,7 +6,6 @@ import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.user.session.UserSession;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;

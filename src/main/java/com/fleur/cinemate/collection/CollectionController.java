@@ -1,9 +1,9 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

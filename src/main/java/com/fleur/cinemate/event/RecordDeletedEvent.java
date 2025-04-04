@@ -15,8 +15,4 @@ public class RecordDeletedEvent extends ApplicationEvent {
         this.recordId = recordId;
         this.entityName = entityName;
     }
-
-
-
-
 }

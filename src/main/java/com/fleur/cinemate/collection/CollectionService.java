@@ -1,11 +1,10 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.event.RecordDeletedEvent;
-import com.fleur.cinemate.search.repository.CollectionDocumentRepository;
-import com.fleur.cinemate.user.User;
-import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.event.RecordDeletedEvent;
+import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

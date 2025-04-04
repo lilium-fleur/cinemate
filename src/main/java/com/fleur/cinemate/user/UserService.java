@@ -3,8 +3,8 @@ package com.fleur.cinemate.user;
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.auth.dto.RegisterDto;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

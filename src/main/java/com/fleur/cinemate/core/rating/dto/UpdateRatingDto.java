@@ -9,6 +9,6 @@ public record UpdateRatingDto(
         Long filmId,
         @Min(0)
         @Max(10)
-        Integer score
+        Double rating
 ) {
 }
