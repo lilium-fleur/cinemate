@@ -42,7 +42,11 @@ public class SearchFilmService {
         if (filter.query() != null && !filter.query().trim().isEmpty()) {
             searchQuery = MultiMatchQuery.of(m -> m
                             .query(filter.query())
-                            .fields("title^4", "description^2", "genres_search^3", "actors_search^3")
+                            .fields("title^4",
+                                    "description^2",
+                                    "genres_search^3",
+                                    "actors_search^3",
+                                    "directors_search^3")
                             .fuzziness("AUTO")
                             .prefixLength(1))
                     ._toQuery();
@@ -118,7 +122,7 @@ public class SearchFilmService {
             SearchHits<FilmDocument> hits = elasticsearchOperations.search(query, FilmDocument.class);
             Suggest suggest = hits.getSuggest();
 
-            if(suggest == null) {
+            if (suggest == null) {
                 return new ArrayList<>();
             }
 
@@ -142,7 +146,7 @@ public class SearchFilmService {
                 nativeQuery, FilmDocument.class, IndexCoordinates.of("films"));
 
         //для отладки
-        hits.forEach(hit -> System.out.println("Score: " + hit.getScore() + ", Movie: " + hit.getContent().getTitle()));
+        hits.forEach(hit -> System.out.println("Score: " + hit.getScore() + ", Film: " + hit.getContent().getTitle()));
 
         //достаем айдишники найденых фильмов
         List<Long> filmIds = hits.stream()

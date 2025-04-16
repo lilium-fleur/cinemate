@@ -1,6 +1,6 @@
 package com.fleur.cinemate.search.controller.sync;
 
-import com.fleur.cinemate.search.service.sync.SyncActorService;
+import com.fleur.cinemate.search.service.sync.SyncPersonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/elasticsearch/actors/sync")
 public class SyncActorController {
-    private final SyncActorService syncActorService;
+    private final SyncPersonService syncPersonService;
 
     @PostMapping("/full")
     public ResponseEntity<Void> addAllFilms() {
-        syncActorService.syncAll();
+        syncPersonService.syncAll();
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/incremental")
     public ResponseEntity<Void> addNewFilms() {
-        syncActorService.incrementalSync();
+        syncPersonService.incrementalSync();
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,8 +1,8 @@
-package com.fleur.cinemate.core.actor.dto;
+package com.fleur.cinemate.core.person.dto;
 
 import java.time.LocalDate;
 
-public record UpdateActorDto(
+public record UpdatePersonDto(
         String name,
         LocalDate born,
         String portraitUrl

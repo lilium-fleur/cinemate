@@ -1,8 +1,8 @@
 package com.fleur.cinemate.search.service;
 
-import com.fleur.cinemate.search.repository.ActorDocumentRepository;
 import com.fleur.cinemate.search.repository.CollectionDocumentRepository;
 import com.fleur.cinemate.search.repository.FilmDocumentRepository;
+import com.fleur.cinemate.search.repository.PersonDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class ESDeleteService {
 
     private final FilmDocumentRepository filmDocumentRepository;
-    private final ActorDocumentRepository actorDocumentRepository;
+    private final PersonDocumentRepository personDocumentRepository;
     private final CollectionDocumentRepository collectionDocumentRepository;
 
     public void deleteByEntityName(String name, Long documentId){
@@ -21,8 +21,8 @@ public class ESDeleteService {
             case "film":
                 filmDocumentRepository.deleteById(documentId);
                 break;
-            case "actor":
-                actorDocumentRepository.deleteById(documentId);
+            case "person":
+                personDocumentRepository.deleteById(documentId);
                 break;
             case "collection":
                 collectionDocumentRepository.deleteById(documentId);

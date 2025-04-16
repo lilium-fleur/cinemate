@@ -9,12 +9,15 @@ import com.fleur.cinemate.core.relations.filmGenre.dto.CreateFilmGenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class FilmGenreService {
+
     private final FilmGenreRepository filmGenreRepository;
     private final FilmRepository filmRepository;
     private final GenreRepository genreRepository;
@@ -45,6 +48,18 @@ public class FilmGenreService {
                 .orElseThrow(() -> new EntityNotFoundException("Genre was not added to this Film"));
 
         filmGenreRepository.delete(filmGenre);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FilmGenreDto> findAllByGenre(Long genreId, Pageable pageable) {
+        return filmGenreRepository.findByGenreId(genreId, pageable)
+                .map(filmGenreMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FilmGenreDto> findAllByFilm(Long filmId, Pageable pageable) {
+        return filmGenreRepository.findByFilmId(filmId, pageable)
+                .map(filmGenreMapper::toDto);
     }
 
 }

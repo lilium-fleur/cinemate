@@ -4,10 +4,6 @@ package com.fleur.cinemate.core.film;
 import com.fleur.cinemate.core.film.dto.CreateFilmDto;
 import com.fleur.cinemate.core.film.dto.FilmDto;
 import com.fleur.cinemate.core.film.dto.UpdateFilmDto;
-import com.fleur.cinemate.core.relations.filmActor.FilmActor;
-import com.fleur.cinemate.core.relations.filmActor.FilmActorRepository;
-import com.fleur.cinemate.core.relations.filmGenre.FilmGenre;
-import com.fleur.cinemate.core.relations.filmGenre.FilmGenreRepository;
 import com.fleur.cinemate.event.RecordDeletedEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
@@ -28,9 +25,8 @@ public class FilmService {
 
     private final FilmRepository filmRepository;
     private final FilmMapper filmMapper;
-    private final FilmActorRepository filmActorRepository;
-    private final FilmGenreRepository filmGenreRepository;
     private final ApplicationEventPublisher eventPublisher;
+
 
     @Transactional
     public FilmDto createFilm(CreateFilmDto createFilmDto){
@@ -94,18 +90,14 @@ public class FilmService {
                 .toList();
     }
 
-    @Transactional(readOnly = true)
-    public Page<FilmDto> findFilmsByActor(Long actorId, Pageable pageable){
-        return filmActorRepository.findByActorId(actorId, pageable)
-                .map(FilmActor::getFilm)
-                .map(filmMapper::toDto);
+    @Transactional
+    public List<FilmDto> createSomeFilms(List<CreateFilmDto> createFilmDtos) {
+        List<FilmDto> newFilms = new ArrayList<>();
+        for (CreateFilmDto createFilmDto : createFilmDtos) {
+            Film newFilm = filmMapper.toEntity(createFilmDto);
+            FilmDto dto = filmMapper.toDto(filmRepository.save(newFilm));
+            newFilms.add(dto);
+        }
+        return newFilms;
     }
-
-    @Transactional(readOnly = true)
-    public Page<FilmDto> findFilmsByGenre(Long genreId, Pageable pageable) {
-        return filmGenreRepository.findByGenreId(genreId, pageable)
-                .map(FilmGenre::getFilm)
-                .map(filmMapper::toDto);
-    }
-
 }

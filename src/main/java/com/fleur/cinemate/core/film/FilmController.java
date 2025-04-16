@@ -11,12 +11,21 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/films")
 @RequiredArgsConstructor
 public class FilmController {
 
     private final FilmService filmService;
+
+
+    @PostMapping("/create-some")
+    public ResponseEntity<List<FilmDto>> createSomeFilms(
+            @RequestBody List<CreateFilmDto> createFilmDtos) {
+        return ResponseEntity.ok(filmService.createSomeFilms(createFilmDtos));
+    }
 
     @PostMapping
     public ResponseEntity<FilmDto> createFilm(

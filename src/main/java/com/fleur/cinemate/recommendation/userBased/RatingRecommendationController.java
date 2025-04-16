@@ -22,5 +22,4 @@ public class RatingRecommendationController {
                 .ok(ratingRecommendationService.getRecommendations(userId, 20));
     }
 
-
 }

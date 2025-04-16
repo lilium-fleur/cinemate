@@ -1,7 +1,5 @@
 package com.fleur.cinemate.core.relations.filmGenre;
 
-import com.fleur.cinemate.core.genre.GenreService;
-import com.fleur.cinemate.core.genre.dto.GenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.dto.CreateFilmGenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
 import jakarta.validation.Valid;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class FilmGenreController {
 
     private final FilmGenreService filmGenreService;
-    private final GenreService genreService;
 
     @PostMapping
     public ResponseEntity<FilmGenreDto> addGenreToFilm(
@@ -27,10 +24,10 @@ public class FilmGenreController {
         return ResponseEntity.ok(filmGenreService.addGenreToFilm(filmId, createFilmGenreDto));
     }
     @GetMapping
-    public ResponseEntity<Page<GenreDto>> getFilmGenres(
+    public ResponseEntity<Page<FilmGenreDto>> getFilmGenres(
             @PathVariable Long filmId,
             @PageableDefault Pageable pageable){
-        return ResponseEntity.ok(genreService.findGenresByFilm(filmId, pageable));
+        return ResponseEntity.ok(filmGenreService.findAllByFilm(filmId, pageable));
     }
 
     @DeleteMapping("/{genreId}")

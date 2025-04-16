@@ -13,9 +13,9 @@ import org.springframework.data.elasticsearch.annotations.Setting;
 @Setter
 @Getter
 @Builder
-@Document(indexName = "actors")
+@Document(indexName = "persons")
 @Setting(replicas = 0)
-public class ActorDocument {
+public class PersonDocument {
 
     @Id
     private Long id;

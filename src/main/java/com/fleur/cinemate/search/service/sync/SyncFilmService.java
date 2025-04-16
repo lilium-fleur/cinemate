@@ -1,11 +1,11 @@
 package com.fleur.cinemate.search.service.sync;
 
-import com.fleur.cinemate.core.actor.ActorService;
-import com.fleur.cinemate.core.actor.dto.ActorDto;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.core.genre.GenreService;
 import com.fleur.cinemate.core.genre.dto.GenreDto;
+import com.fleur.cinemate.core.relations.filmPerson.FilmPersonService;
+import com.fleur.cinemate.core.relations.filmPerson.Role;
 import com.fleur.cinemate.search.document.FilmDocument;
 import com.fleur.cinemate.search.entity.IndexName;
 import com.fleur.cinemate.search.repository.ESSyncDateRepository;
@@ -17,6 +17,7 @@ import org.springframework.data.elasticsearch.core.suggest.Completion;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -26,19 +27,18 @@ public class SyncFilmService extends SyncService<Film> {
 
     private final FilmDocumentRepository filmDocumentRepository;
     private final GenreService genreService;
-    private final ActorService actorService;
     private final FilmService filmService;
+    private final FilmPersonService filmPersonService;
 
     public SyncFilmService(ESSyncDateRepository esSyncDateRepository,
                            FilmDocumentRepository filmDocumentRepository,
                            GenreService genreService,
-                           ActorService actorService,
-                           FilmService filmService) {
+                           FilmService filmService, FilmPersonService filmPersonService) {
         super(esSyncDateRepository);
         this.filmDocumentRepository = filmDocumentRepository;
         this.genreService = genreService;
-        this.actorService = actorService;
         this.filmService = filmService;
+        this.filmPersonService = filmPersonService;
     }
 
     @Override
@@ -47,11 +47,15 @@ public class SyncFilmService extends SyncService<Film> {
             Set<String> genres = genreService.findGenresByFilm(film.getId(), Pageable.unpaged())
                     .map(GenreDto::name)
                     .toSet();
-            Set<String> actors = actorService.findActorsByFilm(film.getId(), Pageable.unpaged())
-                    .map(ActorDto::name)
-                    .toSet();
+            Set<String> actors = new HashSet<>(
+                    filmPersonService.findPersonNamesByFilmAndRole(
+                            film.getId(), Role.ACTOR));
+
+            Set<String> directors = new HashSet<>(
+                    filmPersonService.findPersonNamesByFilmAndRole(
+                            film.getId(), Role.DIRECTOR));
             try {
-                filmDocumentRepository.save(convertToDocument(film, genres, actors));
+                filmDocumentRepository.save(convertToDocument(film, genres, actors, directors));
             } catch (Exception e) {
                 log.error("Error saving film document with id {} to index: {}",
                         film.getId(), e.getMessage());
@@ -75,7 +79,10 @@ public class SyncFilmService extends SyncService<Film> {
         return IndexName.FILMS;
     }
 
-    private FilmDocument convertToDocument(Film film, Set<String> filmGenreNames, Set<String> filmActorNames) {
+    private FilmDocument convertToDocument(Film film,
+                                           Set<String> filmGenreNames,
+                                           Set<String> filmActorNames,
+                                           Set<String> filmDirectorNames) {
         return FilmDocument.builder()
                 .id(film.getId())
                 .title(film.getTitle())
@@ -83,10 +90,12 @@ public class SyncFilmService extends SyncService<Film> {
                 .releaseYear(film.getReleaseYear())
                 .rating(film.getSourceRating())
                 .suggest(new Completion(new String[]{film.getTitle()}))
-                .actors(filmActorNames)
-                .actorsSearch(String.join(" ", filmActorNames))
                 .genres(filmGenreNames)
                 .genresSearch(String.join(" ", filmGenreNames))
+                .actors(filmActorNames)
+                .actorsSearch(String.join(" ", filmActorNames))
+                .directors(filmDirectorNames)
+                .directorsSearch(String.join(" ", filmDirectorNames))
                 .build();
     }
 

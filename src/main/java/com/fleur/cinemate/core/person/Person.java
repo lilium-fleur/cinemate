@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.actor;
+package com.fleur.cinemate.core.person;
 
 import com.fleur.cinemate.__shared.model.BaseEntity;
 import jakarta.persistence.Column;
@@ -17,9 +17,9 @@ import java.time.LocalDate;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "actors")
+@Table(name = "persons")
 @Entity
-public class Actor extends BaseEntity {
+public class Person extends BaseEntity {
 
     @Column(nullable = false)
     private String name;

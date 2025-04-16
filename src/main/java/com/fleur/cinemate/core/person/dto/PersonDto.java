@@ -1,9 +1,9 @@
-package com.fleur.cinemate.core.actor.dto;
+package com.fleur.cinemate.core.person.dto;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
-public record ActorDto(
+public record PersonDto(
         Long id,
         String name,
         LocalDate born,

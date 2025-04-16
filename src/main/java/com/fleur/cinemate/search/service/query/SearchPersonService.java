@@ -3,9 +3,9 @@ package com.fleur.cinemate.search.service.query;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import com.fleur.cinemate.core.actor.ActorService;
-import com.fleur.cinemate.core.actor.dto.ActorDto;
-import com.fleur.cinemate.search.document.ActorDocument;
+import com.fleur.cinemate.core.person.PersonService;
+import com.fleur.cinemate.core.person.dto.PersonDto;
+import com.fleur.cinemate.search.document.PersonDocument;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
-public class SearchActorService {
-    private final ActorService actorService;
+public class SearchPersonService {
+    private final PersonService personService;
     private final ElasticsearchOperations elasticsearchOperations;
 
 
-    public Page<ActorDto> findActorsByQuery(String query, Pageable pageable) {
+    public Page<PersonDto> findActorsByQuery(String query, Pageable pageable) {
         Query searchQuery;
 
         if(query != null && !query.isBlank()){
@@ -48,17 +48,17 @@ public class SearchActorService {
         return searchAndMap(nativeQuery, pageable);
     }
 
-    private Page<ActorDto> searchAndMap(NativeQuery nativeQuery, Pageable pageable) {
-        SearchHits<ActorDocument> hits = elasticsearchOperations.search(nativeQuery, ActorDocument.class);
+    private Page<PersonDto> searchAndMap(NativeQuery nativeQuery, Pageable pageable) {
+        SearchHits<PersonDocument> hits = elasticsearchOperations.search(nativeQuery, PersonDocument.class);
 
         List<Long> actorIds = hits.stream()
                 .map(hit -> hit.getContent().getId())
                 .toList();
 
-        Map<Long, ActorDto> actorsMap= actorService.findAllActorsById(actorIds).stream()
-                .collect(Collectors.toMap(ActorDto::id, a -> a));
+        Map<Long, PersonDto> actorsMap = personService.findAllPersonsById(actorIds).stream()
+                .collect(Collectors.toMap(PersonDto::id, a -> a));
 
-        List<ActorDto> result = actorIds.stream()
+        List<PersonDto> result = actorIds.stream()
                 .map(actorsMap::get)
                 .toList();
 

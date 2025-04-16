@@ -45,10 +45,16 @@ public class FilmDocument {
     @Builder.Default
     private Set<String> actors = new HashSet<>();
 
+    @Field(type = FieldType.Keyword, normalizer = "lowercase")
+    @Builder.Default
+    private Set<String> directors = new HashSet<>();
+
     @Field(type = FieldType.Text, name = "genres_search", analyzer = "english")
     private String genresSearch;
 
     @Field(type = FieldType.Text, name = "actors_search", analyzer = "english")
     private String actorsSearch;
 
+    @Field(type = FieldType.Text, name = "actors_search", analyzer = "english")
+    private String directorsSearch;
 }
