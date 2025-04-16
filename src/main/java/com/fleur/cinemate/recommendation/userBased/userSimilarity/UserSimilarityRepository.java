@@ -17,14 +17,14 @@ public interface UserSimilarityRepository extends JpaRepository<UserSimilarity, 
     Optional<UserSimilarity> findByUser1IdAndUser2Id(Long user1Id, Long user2Id);
 
     @Query("SELECT us FROM UserSimilarity us " +
-            "WHERE us.user1 = :userId " +
-            "OR us.user2 = :userId")
+            "WHERE us.user1.id = :userId " +
+            "OR us.user2.id = :userId")
     List<UserSimilarity> findByUserId(Long userId);
 
 
     @Modifying
     @Query("DELETE FROM UserSimilarity us " +
-            "WHERE us.user1 = :userId " +
-            "OR us.user2 = :userId")
+            "WHERE us.user1.id = :userId " +
+            "OR us.user2.id = :userId")
     void deleteByUserId(Long userId);
 }

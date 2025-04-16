@@ -5,6 +5,7 @@ import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
 import com.fleur.cinemate.core.rating.dto.CreateRatingDto;
 import com.fleur.cinemate.core.rating.dto.RatingDto;
+import com.fleur.cinemate.event.RatingCreatedEvent;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -41,9 +42,7 @@ public class RatingService {
                 .build();
         RatingDto savedRatingDto = ratingMapper.toDto(ratingRepository.save(rating));
 
-        userSimilarityService.deleteSimilarityByUser(user.getId());
-
-        cacheableRatingService.recomputeSimilaritiesAsync(user.getId());
+        eventPublisher.publishEvent(new RatingCreatedEvent(this, user.getId()));
 
         return savedRatingDto;
     }

@@ -47,7 +47,7 @@ public class RatingRecommendationService {
         } while (ratings.hasNext());
 
         recommendationsFilms = recommendationsFilms.entrySet().stream()
-                .filter(e -> e.getValue() > userAvgRating)
+                .filter(e -> e.getValue() >= userAvgRating)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return recommendationsFilms.entrySet().stream()
@@ -60,6 +60,7 @@ public class RatingRecommendationService {
                         LinkedHashMap::new
                 ));
     }
+
 
     private List<Long> gerRatedFilms(Long user) {
         return ratingService.findByUserId(user).stream()

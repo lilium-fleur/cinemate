@@ -5,6 +5,7 @@ import com.fleur.cinemate.core.rating.RatingService;
 import com.fleur.cinemate.recommendation.userBased.userSimilarity.UserSimilarity;
 import com.fleur.cinemate.recommendation.userBased.userSimilarity.UserSimilarityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class CacheableRatingService {
@@ -83,7 +85,7 @@ public class CacheableRatingService {
      * @return список похожих на mainUser пользователей. Возвращает map с ключом - id похожего юзера,
      * значение - значение схожести этого юзера, с тем для кого проводится вычисление
      */
-    @Cacheable(value = "similarUsers", key = "{#mainUser, #countOfUsers}")
+    @Cacheable(value = "similarUsers", key = "{#mainUser, #countOfUsers}", unless = "#result.isEmpty()")
     public Map<Long, Double> getSimilarUsers(Long mainUser, Integer countOfUsers) {
         List<UserSimilarity> similarities = userSimilarityService.findSimilaritiesByUser(mainUser);
         if (!similarities.isEmpty()) {
@@ -124,7 +126,8 @@ public class CacheableRatingService {
         } while (allUsers.hasNext());
 
         usersSimilarities = usersSimilarities.entrySet().stream()
-                .filter(entry -> entry.getValue() != 0.0)
+                .filter(entry -> entry.getValue() != null
+                        && entry.getValue() != 0.0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         LinkedHashMap<Long, Double> resultSimilarUsers = usersSimilarities.entrySet().stream()
@@ -174,8 +177,13 @@ public class CacheableRatingService {
         commonFilms.retainAll(user2RatingsMap.keySet());
 
         if (commonFilms.isEmpty()) {
+            log.debug("No common films between users: user id: {} and user id: {}", user1, user2);
             return 0.0;
         }
+
+        commonFilms.removeIf(filmId ->
+                user1RatingsMap.get(filmId) == null || user2RatingsMap.get(filmId) == null
+        );
 
         double avg1 = commonFilms.stream()
                 .mapToDouble(user1RatingsMap::get)
@@ -194,6 +202,11 @@ public class CacheableRatingService {
         for (Long filmId : commonFilms) {
             double score1 = user1RatingsMap.get(filmId);
             double score2 = user2RatingsMap.get(filmId);
+
+            if (Double.isNaN(score1) || Double.isInfinite(score1) ||
+                    Double.isNaN(score2) || Double.isInfinite(score2)) {
+                continue;
+            }
 
             double diff1 = score1 - avg1;
             double diff2 = score2 - avg2;
