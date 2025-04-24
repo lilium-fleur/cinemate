@@ -1,7 +1,7 @@
-package com.fleur.cinemate.collection.collectionItem;
+package com.fleur.cinemate.collection.item;
 
-import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
-import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
+import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.item.dto.CreateCollectionItemDto;
 import com.fleur.cinemate.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

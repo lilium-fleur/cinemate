@@ -37,6 +37,6 @@ public class UserListController {
             @AuthenticationPrincipal User user,
             @PathVariable String listType,
             @PageableDefault Pageable pageable){
-        return ResponseEntity.ok(userListService.getFilmsByTypeList(user, listType, pageable));
+        return ResponseEntity.ok(userListService.findItemsByTypeList(user, listType, pageable));
     }
 }

@@ -1,4 +1,4 @@
-package com.fleur.cinemate.collection.collectionItem;
+package com.fleur.cinemate.collection.item;
 
 
 import com.fleur.cinemate.__shared.model.IdEntity;

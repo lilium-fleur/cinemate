@@ -1,7 +1,7 @@
-package com.fleur.cinemate.collection.collectionItem;
+package com.fleur.cinemate.collection.item;
 
 import com.fleur.cinemate.collection.Collection;
-import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
 import com.fleur.cinemate.core.film.Film;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

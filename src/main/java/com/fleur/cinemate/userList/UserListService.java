@@ -53,7 +53,7 @@ public class UserListService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserListDto> getFilmsByTypeList(User user, String listType, Pageable pageable){
+    public Page<UserListDto> findItemsByTypeList(User user, String listType, Pageable pageable){
         try {
             UserListType userListType = UserListType.valueOf(listType.toUpperCase());
             return userListRepository.findByUserAndType(user, userListType, pageable)
@@ -61,6 +61,12 @@ public class UserListService {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid list type");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Film> findFilmsByTypeList(User user, UserListType type, Pageable pageable){
+        return userListRepository.findByUserAndType(user, type, pageable)
+                .map(UserList::getFilm);
     }
 
 

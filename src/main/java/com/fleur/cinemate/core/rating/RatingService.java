@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -50,6 +51,10 @@ public class RatingService {
     @Transactional(readOnly = true)
     public List<Rating> findByUserId(Long userId) {
         return ratingRepository.findAllByUserId(userId);
+    }
+
+    public Optional<Rating> findByFilmIdAndUserId(Long filmId, Long userId) {
+        return ratingRepository.findByFilmIdAndUserId(filmId, userId);
     }
 
     @Transactional(readOnly = true)

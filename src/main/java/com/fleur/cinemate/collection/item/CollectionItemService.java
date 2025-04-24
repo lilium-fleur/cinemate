@@ -1,10 +1,10 @@
-package com.fleur.cinemate.collection.collectionItem;
+package com.fleur.cinemate.collection.item;
 
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.collection.Collection;
 import com.fleur.cinemate.collection.CollectionService;
-import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
-import com.fleur.cinemate.collection.collectionItem.dto.CreateCollectionItemDto;
+import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.item.dto.CreateCollectionItemDto;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
 import com.fleur.cinemate.user.User;
@@ -101,7 +101,7 @@ public class CollectionItemService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CollectionItemDto> findItemsByCollection(
+    public Page<CollectionItemDto> findItemsDtoByCollection(
             Long filmCollectionId,
             User currentUser,
             Pageable pageable) {
@@ -110,6 +110,16 @@ public class CollectionItemService {
 
         return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable)
                 .map(collectionItemMapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CollectionItem> findItemsByCollection(
+            Long filmCollectionId,
+            User currentUser,
+            Pageable pageable) {
+
+        Long collectionId = collectionService.findCollectionById(filmCollectionId, currentUser).id();
+        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable)
     }
 
     @Transactional(readOnly = true)

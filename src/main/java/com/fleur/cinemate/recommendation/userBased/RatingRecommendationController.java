@@ -16,7 +16,7 @@ public class RatingRecommendationController {
     private final RatingRecommendationService ratingRecommendationService;
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Map<Long, Double>> getRecommendation(
+    public ResponseEntity<Map<Long, Double>> getRecommendations(
             @PathVariable Long userId) {
         return ResponseEntity
                 .ok(ratingRecommendationService.getRecommendations(userId, 20));

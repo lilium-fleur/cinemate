@@ -1,8 +1,8 @@
 package com.fleur.cinemate.user;
 
 import com.fleur.cinemate.collection.CollectionService;
-import com.fleur.cinemate.collection.collectionItem.CollectionItemService;
-import com.fleur.cinemate.collection.collectionItem.dto.CollectionItemDto;
+import com.fleur.cinemate.collection.item.CollectionItemService;
+import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
 import com.fleur.cinemate.collection.dto.CollectionDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ public class UserController {
             @PathVariable Long userId,
             @AuthenticationPrincipal User user,
             @PageableDefault Pageable pageable){
-        return ResponseEntity.ok(collectionService.findCollectionsByUser(user, userId, pageable));
+        return ResponseEntity.ok(collectionService.findCollectionsByUserForAll(user, userId, pageable));
     }
 
     @GetMapping("/{userId}/collections/{collectionId}")

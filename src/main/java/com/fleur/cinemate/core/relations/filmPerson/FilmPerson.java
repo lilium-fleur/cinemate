@@ -15,13 +15,13 @@ import lombok.*;
 @Table(name = "film_persons")
 @Entity
 public class FilmPerson extends IdEntity {
-        @ManyToOne
-        @JoinColumn(name = "film_id", nullable = false)
-        private Film film;
+    @ManyToOne
+    @JoinColumn(name = "film_id", nullable = false)
+    private Film film;
 
-        @ManyToOne
-        @JoinColumn(name = "person_id", nullable = false)
-        private Person person;
+    @ManyToOne
+    @JoinColumn(name = "person_id", nullable = false)
+    private Person person;
 
     @Column(nullable = false)
     private Role role;

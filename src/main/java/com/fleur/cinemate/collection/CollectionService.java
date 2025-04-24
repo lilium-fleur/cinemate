@@ -95,11 +95,17 @@ public class CollectionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CollectionDto> findCollectionsByUser(User currentUser, Long userId, Pageable pageable) {
+    public Page<CollectionDto> findCollectionsByUserForAll(User currentUser, Long userId, Pageable pageable) {
         if(currentUser.getId().equals(userId)) {
             return findCollectionsForCurrentUser(currentUser, pageable);
         }
         return findPublicCollectionsByUser(userId, pageable);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<Collection> findAllCollectionsByUser(User user, Pageable pageable) {
+        return collectionRepository.findAllByUser(user, pageable);
     }
 
     @Transactional(readOnly = true)
