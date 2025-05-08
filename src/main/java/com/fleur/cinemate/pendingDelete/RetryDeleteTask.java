@@ -1,4 +1,4 @@
-package com.fleur.cinemate.pending;
+package com.fleur.cinemate.pendingDelete;
 
 import com.fleur.cinemate.search.service.ESDeleteService;
 import lombok.RequiredArgsConstructor;

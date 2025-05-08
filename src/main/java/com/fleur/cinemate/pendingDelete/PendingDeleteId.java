@@ -1,5 +1,4 @@
-package com.fleur.cinemate.core.relations.filmGenre;
-
+package com.fleur.cinemate.pendingDelete;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,9 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FilmGenreId implements Serializable {
-
-    private Long film;
-
-    private Long genre;
+public class PendingDeleteId implements Serializable {
+    private Long recordId;
+    private Long entityName;
 }

@@ -3,6 +3,7 @@ package com.fleur.cinemate.core.relations.filmPerson;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.person.Person;
 import com.fleur.cinemate.core.relations.filmPerson.dto.FilmPersonDto;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmPerson;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

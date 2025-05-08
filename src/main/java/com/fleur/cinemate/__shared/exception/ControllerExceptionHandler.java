@@ -39,7 +39,6 @@ public class ControllerExceptionHandler {
                 .message(ex.getMessage())
                 .description(request.getDescription(false))
                 .build();
-
     }
 
     @ExceptionHandler(Exception.class)

@@ -55,6 +55,6 @@ public class FilmDocument {
     @Field(type = FieldType.Text, name = "actors_search", analyzer = "english")
     private String actorsSearch;
 
-    @Field(type = FieldType.Text, name = "actors_search", analyzer = "english")
+    @Field(type = FieldType.Text, name = "directors_search", analyzer = "english")
     private String directorsSearch;
 }

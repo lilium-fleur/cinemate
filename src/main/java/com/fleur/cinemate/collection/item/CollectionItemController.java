@@ -31,7 +31,7 @@ public class CollectionItemController {
             @PathVariable Long filmCollectionId,
             @AuthenticationPrincipal User user,
             @PageableDefault(sort = "position") Pageable pageable){
-        return ResponseEntity.ok(collectionItemService.findItemsByCollection(filmCollectionId, user, pageable));
+        return ResponseEntity.ok(collectionItemService.findItemsDtoByCollection(filmCollectionId, user, pageable));
     }
 
 

@@ -1,14 +1,19 @@
 package com.fleur.cinemate.recommendation.userBased;
 
+import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.rating.Rating;
 import com.fleur.cinemate.core.rating.RatingService;
+import com.fleur.cinemate.recommendation.dto.RecommendationDto;
+import com.fleur.cinemate.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,45 +25,54 @@ public class RatingRecommendationService {
     private final CacheableRatingService cacheableRatingService;
 
 
+    public Page<RecommendationDto> getRecommendFilms(User user, Pageable pageable) {
+        Map<Film, Double> recommendationsMap = getRecommendations(user.getId());
+        List<RecommendationDto> recommendationDtoList = new ArrayList<>();
+
+        for (Map.Entry<Film, Double> entry : recommendationsMap.entrySet()) {
+            RecommendationDto recommendationDto = RecommendationDto.builder()
+                    .film(entry.getKey())
+                    .recommendationScore(entry.getValue())
+                    .build();
+            recommendationDtoList.add(recommendationDto);
+        }
+
+        return new PageImpl<>(
+                recommendationDtoList,
+                pageable,
+                recommendationDtoList.size());
+    }
+
     /**
      * Метод находит фильмы для рекомендации пользователю
      *
      * @param user                    Пользователь для которого вычисляется рекомендованные фильмы
-     * @param numberOfRecommendations Количество выдаваемых рекомендованных фильмов
      * @return Map<Long, Double>, где Long - айди фильма для рекомендации, а Double - предсказанный рейтинг
      */
-    public Map<Long, Double> getRecommendations(Long user, Integer numberOfRecommendations) {
+    private Map<Film, Double> getRecommendations(Long user) {
         List<Long> userFilms = gerRatedFilms(user);
         Double userAvgRating = cacheableRatingService.getAvgRating(user);
         Map<Long, Double> topSimilarUsers = cacheableRatingService.getSimilarUsers(user, 20);
 
         int page = 0;
-        int size = 1000;
+        int size = 100;
         Page<Rating> ratings;
-        Map<Long, Double> recommendationsFilms = new HashMap<>();
+        Map<Film, Double> recommendationsFilms = new HashMap<>();
 
         do {
             ratings = ratingService.findRatingsExcludeFilms(userFilms, PageRequest.of(page, size));
             for (Rating rating : ratings.getContent()) {
                 Double predictedRating = predictRating(user, rating.getFilm().getId(), topSimilarUsers);
-                recommendationsFilms.put(rating.getFilm().getId(), predictedRating);
+                recommendationsFilms.put(rating.getFilm(), predictedRating);
             }
             page++;
         } while (ratings.hasNext());
 
         recommendationsFilms = recommendationsFilms.entrySet().stream()
-                .filter(e -> e.getValue() >= userAvgRating)
+                .filter(e -> e.getValue() >= userAvgRating - 1)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        return recommendationsFilms.entrySet().stream()
-                .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
-                .limit(numberOfRecommendations)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
+        return recommendationsFilms;
     }
 
 

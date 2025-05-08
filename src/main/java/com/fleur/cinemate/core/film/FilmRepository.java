@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.Set;
 
 
 @Repository
@@ -17,4 +18,5 @@ public interface FilmRepository extends JpaRepository<Film, Long> {
             "OR f.lastModifiedAt > :sinceDate")
     Page<Film> findModifiedSince(Instant sinceDate, Pageable pageable);
 
+    Page<Film> findByIdNotIn(Set<Long> ids, Pageable pageable);
 }

@@ -1,4 +1,4 @@
-package com.fleur.cinemate.pending;
+package com.fleur.cinemate.pendingDelete;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

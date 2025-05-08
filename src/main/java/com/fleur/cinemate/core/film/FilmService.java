@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -88,6 +89,11 @@ public class FilmService {
         return filmRepository.findAllById(ids).stream()
                 .map(filmMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Film> findAllNotIn(Set<Long> ids, Pageable pageable) {
+        return filmRepository.findByIdNotIn(ids, pageable);
     }
 
     @Transactional

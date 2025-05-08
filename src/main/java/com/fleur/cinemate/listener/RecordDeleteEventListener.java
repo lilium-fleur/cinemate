@@ -1,8 +1,8 @@
 package com.fleur.cinemate.listener;
 
 import com.fleur.cinemate.event.RecordDeletedEvent;
-import com.fleur.cinemate.pending.PendingDelete;
-import com.fleur.cinemate.pending.PendingDeleteRepository;
+import com.fleur.cinemate.pendingDelete.PendingDelete;
+import com.fleur.cinemate.pendingDelete.PendingDeleteRepository;
 import com.fleur.cinemate.search.service.ESDeleteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

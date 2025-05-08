@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +120,12 @@ public class CollectionItemService {
             Pageable pageable) {
 
         Long collectionId = collectionService.findCollectionById(filmCollectionId, currentUser).id();
-        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable)
+        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> findDistinctItemsByCollectionIn(List<Long> collectionIds) {
+        return collectionItemRepository.findDistinctByCollectionIdIn(collectionIds);
     }
 
     @Transactional(readOnly = true)

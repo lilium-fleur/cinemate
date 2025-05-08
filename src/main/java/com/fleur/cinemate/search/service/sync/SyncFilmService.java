@@ -2,10 +2,9 @@ package com.fleur.cinemate.search.service.sync;
 
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmService;
-import com.fleur.cinemate.core.genre.GenreService;
-import com.fleur.cinemate.core.genre.dto.GenreDto;
+import com.fleur.cinemate.core.relations.filmGenre.FilmGenreService;
 import com.fleur.cinemate.core.relations.filmPerson.FilmPersonService;
-import com.fleur.cinemate.core.relations.filmPerson.Role;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmRole;
 import com.fleur.cinemate.search.document.FilmDocument;
 import com.fleur.cinemate.search.entity.IndexName;
 import com.fleur.cinemate.search.repository.ESSyncDateRepository;
@@ -18,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -26,34 +27,39 @@ import java.util.Set;
 public class SyncFilmService extends SyncService<Film> {
 
     private final FilmDocumentRepository filmDocumentRepository;
-    private final GenreService genreService;
     private final FilmService filmService;
     private final FilmPersonService filmPersonService;
+    private final FilmGenreService filmGenreService;
 
     public SyncFilmService(ESSyncDateRepository esSyncDateRepository,
                            FilmDocumentRepository filmDocumentRepository,
-                           GenreService genreService,
-                           FilmService filmService, FilmPersonService filmPersonService) {
+                           FilmService filmService,
+                           FilmPersonService filmPersonService,
+                           FilmGenreService filmGenreService) {
         super(esSyncDateRepository);
         this.filmDocumentRepository = filmDocumentRepository;
-        this.genreService = genreService;
         this.filmService = filmService;
         this.filmPersonService = filmPersonService;
+        this.filmGenreService = filmGenreService;
     }
 
     @Override
     protected void saveToIndex(Page<Film> filmPage) {
-        for (Film film : filmPage) {
-            Set<String> genres = genreService.findGenresByFilm(film.getId(), Pageable.unpaged())
-                    .map(GenreDto::name)
-                    .toSet();
-            Set<String> actors = new HashSet<>(
-                    filmPersonService.findPersonNamesByFilmAndRole(
-                            film.getId(), Role.ACTOR));
+        List<Long> filmIds = filmPage.map(Film::getId).toList();
+        Map<Long, List<String>> genresByFilms = filmGenreService
+                .findGenreNamesByFilms(filmIds);
 
-            Set<String> directors = new HashSet<>(
-                    filmPersonService.findPersonNamesByFilmAndRole(
-                            film.getId(), Role.DIRECTOR));
+        Map<Long, List<String>> actorsByFilms = filmPersonService
+                .findPersonNamesByFilmAndRole(filmIds, FilmRole.ACTOR);
+
+        Map<Long, List<String>> directorsByFilms = filmPersonService
+                .findPersonNamesByFilmAndRole(filmIds, FilmRole.DIRECTOR);
+
+
+        for (Film film : filmPage) {
+            Set<String> genres = new HashSet<>(genresByFilms.getOrDefault(film.getId(), List.of()));
+            Set<String> actors = new HashSet<>(actorsByFilms.getOrDefault(film.getId(), List.of()));
+            Set<String> directors = new HashSet<>(directorsByFilms.getOrDefault(film.getId(), List.of()));
             try {
                 filmDocumentRepository.save(convertToDocument(film, genres, actors, directors));
             } catch (Exception e) {

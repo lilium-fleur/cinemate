@@ -8,9 +8,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
+
+    @Query("SELECT r.film.id AS filmId, r.rating AS rating " +
+            "FROM Rating r " +
+            "WHERE r.film.id IN :filmIds " +
+            "AND r.user.id = :userId")
+    List<RatingProjection> findByFilmIdsAndUserId(Set<Long> filmIds, Long userId);
 
     Optional<Rating> findByFilmIdAndUserId(Long filmId, Long userId);
 

@@ -1,9 +1,10 @@
 package com.fleur.cinemate.user;
 
 import com.fleur.cinemate.collection.CollectionService;
+import com.fleur.cinemate.collection.dto.CollectionDto;
 import com.fleur.cinemate.collection.item.CollectionItemService;
 import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
-import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.recommendation.contentBased.UserProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +16,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     private final CollectionService collectionService;
     private final CollectionItemService collectionItemService;
+    private final UserProfileService userProfileService;
 
 
     @GetMapping("/{userId}/collections")
@@ -36,7 +40,13 @@ public class UserController {
             @PathVariable Long collectionId,
             @AuthenticationPrincipal User user,
             @PageableDefault Pageable pageable){
-        return ResponseEntity.ok(collectionItemService.findItemsByCollection(collectionId, user, pageable));
+        return ResponseEntity.ok(collectionItemService.findItemsDtoByCollection(collectionId, user, pageable));
+    }
+
+    @GetMapping("/recommendation-profile")
+    public ResponseEntity<Map<String, Double>> getRecommendationProfile(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userProfileService.buildUserProfile(user));
     }
 
 }

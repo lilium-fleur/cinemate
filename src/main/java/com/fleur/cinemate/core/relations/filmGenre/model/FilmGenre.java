@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.relations.filmGenre;
+package com.fleur.cinemate.core.relations.filmGenre.model;
 
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.genre.Genre;

@@ -7,6 +7,9 @@ import com.fleur.cinemate.core.person.Person;
 import com.fleur.cinemate.core.person.PersonRepository;
 import com.fleur.cinemate.core.relations.filmPerson.dto.CreateFilmPersonDto;
 import com.fleur.cinemate.core.relations.filmPerson.dto.FilmPersonDto;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmPerson;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmPersonProjection;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmRole;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -27,29 +32,25 @@ public class FilmPersonService {
 
     @Transactional
     public FilmPersonDto addPersonToFilm(Long filmId, CreateFilmPersonDto createFilmPersonDto) {
-        try {
-            Role role = Role.valueOf(createFilmPersonDto.role());
-            filmPersonRepository.findByFilmIdAndPersonIdAndRole(filmId, createFilmPersonDto.personId(), role)
-                    .ifPresent(filmPerson -> {
-                        throw new BadRequestException(String.format
-                                ("Person %s with role %s already added to film %s",
-                                        createFilmPersonDto.personId(), role.name(), filmId));
-                    });
+        FilmRole filmRole = FilmRole.fromString(createFilmPersonDto.role());
+        filmPersonRepository.findByFilmIdAndPersonIdAndFilmRole(filmId, createFilmPersonDto.personId(), filmRole)
+                .ifPresent(filmPerson -> {
+                    throw new BadRequestException(String.format
+                            ("Person %s with role %s already added to film %s",
+                                    createFilmPersonDto.personId(), filmRole.name(), filmId));
+                });
 
-            Film film = filmRepository.findById(filmId)
-                    .orElseThrow(() -> new EntityNotFoundException("Film not found"));
-            Person person = personRepository.findById(createFilmPersonDto.personId())
-                    .orElseThrow(() -> new EntityNotFoundException("Person not found"));
+        Film film = filmRepository.findById(filmId)
+                .orElseThrow(() -> new EntityNotFoundException("Film not found"));
+        Person person = personRepository.findById(createFilmPersonDto.personId())
+                .orElseThrow(() -> new EntityNotFoundException("Person not found"));
 
-            FilmPerson filmPerson = FilmPerson.builder()
-                    .film(film)
-                    .person(person)
-                    .build();
+        FilmPerson filmPerson = FilmPerson.builder()
+                .film(film)
+                .person(person)
+                .build();
 
-            return filmPersonMapper.toDto(filmPersonRepository.save(filmPerson));
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(String.format("Invalid role type: %s", e.getMessage()));
-        }
+        return filmPersonMapper.toDto(filmPersonRepository.save(filmPerson));
     }
 
     @Transactional
@@ -67,11 +68,10 @@ public class FilmPersonService {
     }
 
     @Transactional(readOnly = true)
-    public List<String> findPersonNamesByFilmAndRole(Long filmId, Role role) {
-        return filmPersonRepository.findAllByFilmIdAndRole(filmId, role).stream()
-                .map(FilmPerson::getPerson)
-                .map(Person::getName)
-                .toList();
+    public Map<Long, List<String>> findPersonNamesByFilmAndRole(List<Long> filmIds, FilmRole filmRole) {
+        return filmPersonRepository.findPersonNamesByFilmIdAndRole(filmIds, filmRole).stream()
+                .collect(Collectors.groupingBy(FilmPersonProjection::getFilmId,
+                        Collectors.mapping(FilmPersonProjection::getPersonName, Collectors.toList())));
 
     }
 

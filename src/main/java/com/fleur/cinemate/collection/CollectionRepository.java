@@ -8,15 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Page<Collection> findAllByUser(User user, Pageable pageable);
 
-    @Query("SELECT fc FROM Collection fc " +
-            "WHERE fc.user.id = :userId " +
-            "AND fc.isPublic = true")
+    @Query("SELECT c FROM Collection c " +
+            "WHERE c.user.id = :userId " +
+            "AND c.isPublic = true")
     Page<Collection> findAllPublicByUserId(Long userId, Pageable pageable);
 
     @Query("SELECT c FROM Collection c " +
@@ -32,4 +33,8 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE c.isPublic = true " +
             "AND (c.createdAt > :sinceDate OR c.lastModifiedAt > :sinceDate)")
     Page<Collection> findModifiedSince(Instant sinceDate, Pageable pageable);
+
+    @Query("SELECT c.id FROM Collection c " +
+            "WHERE c.user.id = :userId")
+    List<Long> findCollectionIdsByUser(Long userId);
 }

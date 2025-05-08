@@ -4,7 +4,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/cinemate
+    url: jdbc:postgresql://localhost:5433/cinemate
     username: postgres
     password: root
 

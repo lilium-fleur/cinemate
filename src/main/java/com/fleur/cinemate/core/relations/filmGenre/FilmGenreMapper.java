@@ -3,6 +3,7 @@ package com.fleur.cinemate.core.relations.filmGenre;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.genre.Genre;
 import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
+import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenre;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

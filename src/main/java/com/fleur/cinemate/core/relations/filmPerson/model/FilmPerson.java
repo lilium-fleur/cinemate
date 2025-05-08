@@ -1,4 +1,4 @@
-package com.fleur.cinemate.core.relations.filmPerson;
+package com.fleur.cinemate.core.relations.filmPerson.model;
 
 
 import com.fleur.cinemate.__shared.model.IdEntity;
@@ -24,7 +24,8 @@ public class FilmPerson extends IdEntity {
     private Person person;
 
     @Column(nullable = false)
-    private Role role;
+    @Enumerated(EnumType.STRING)
+    private FilmRole filmRole;
 
     @Column(name = "character_name")
     private String characterName;

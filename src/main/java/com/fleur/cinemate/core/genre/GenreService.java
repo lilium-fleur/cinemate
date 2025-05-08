@@ -3,7 +3,6 @@ package com.fleur.cinemate.core.genre;
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.core.genre.dto.CreateGenreDto;
 import com.fleur.cinemate.core.genre.dto.GenreDto;
-import com.fleur.cinemate.core.relations.filmGenre.FilmGenre;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +54,5 @@ public class GenreService {
         genreRepository.delete(genre);
     }
 
-    @Transactional(readOnly = true)
-    public Page<GenreDto> findGenresByFilm(Long filmId, Pageable pageable){
-        return filmGenreRepository.findByFilmId(filmId, pageable)
-                .map(FilmGenre::getGenre)
-                .map(genreMapper::toDto);
-    }
 
 }

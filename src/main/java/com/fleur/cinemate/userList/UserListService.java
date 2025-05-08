@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class UserListService {
@@ -21,31 +23,28 @@ public class UserListService {
     private final UserListMapper userListMapper;
 
     @Transactional
-    public UserListDto addFilmToList(CreateUserListDto createUserListDto, User user){
-        try {
-            Film film = filmService.findFilmEntityById(createUserListDto.filmId());
-            UserListType userListType = UserListType.valueOf(createUserListDto.type().toUpperCase());
-            userListRepository.findByUserAndFilmAndType(user, film, userListType)
-                    .ifPresent(userList -> {
-                        throw new BadRequestException
-                                (String.format("This Film already added to list: %s", userListType));
-                    });
+    public UserListDto addFilmToList(CreateUserListDto createUserListDto, User user) {
+        Film film = filmService.findFilmEntityById(createUserListDto.filmId());
+        UserListType userListType = UserListType.fromString(createUserListDto.type());
+        userListRepository.findByUserAndFilmAndType(user, film, userListType)
+                .ifPresent(userList -> {
+                    throw new BadRequestException
+                            (String.format("This Film already added to list: %s", userListType));
+                });
 
-            UserList userList = UserList.builder()
-                    .user(user)
-                    .film(film)
-                    .type(userListType)
-                    .build();
+        UserList userList = UserList.builder()
+                .user(user)
+                .film(film)
+                .type(userListType)
+                .build();
 
-            return userListMapper.toDto(userListRepository.save(userList));
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(String.format("Invalid list type: %s", e.getMessage()));
-        }
+        return userListMapper.toDto(userListRepository.save(userList));
+
 
     }
 
     @Transactional
-    public void removeFilmFromList(Long userListId){
+    public void removeFilmFromList(Long userListId) {
         UserList userList = userListRepository.findById(userListId)
                 .orElseThrow(() -> new EntityNotFoundException
                         ("Film was not added to this list"));
@@ -53,20 +52,22 @@ public class UserListService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserListDto> findItemsByTypeList(User user, String listType, Pageable pageable){
-        try {
-            UserListType userListType = UserListType.valueOf(listType.toUpperCase());
-            return userListRepository.findByUserAndType(user, userListType, pageable)
-                    .map(userListMapper::toDto);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid list type");
-        }
+    public Page<UserListDto> findItemsByTypeList(User user, String listType, Pageable pageable) {
+        UserListType userListType = UserListType.fromString(listType);
+        return userListRepository.findByUserAndType(user, userListType, pageable)
+                .map(userListMapper::toDto);
+
     }
 
     @Transactional(readOnly = true)
-    public Page<Film> findFilmsByTypeList(User user, UserListType type, Pageable pageable){
+    public Page<Film> findFilmsByTypeList(User user, UserListType type, Pageable pageable) {
         return userListRepository.findByUserAndType(user, type, pageable)
                 .map(UserList::getFilm);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Long> findDistinctFilmIdByUser(Long userId) {
+        return userListRepository.findDistinctByUser(userId);
     }
 
 

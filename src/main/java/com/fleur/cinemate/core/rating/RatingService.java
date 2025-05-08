@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -53,8 +55,9 @@ public class RatingService {
         return ratingRepository.findAllByUserId(userId);
     }
 
-    public Optional<Rating> findByFilmIdAndUserId(Long filmId, Long userId) {
-        return ratingRepository.findByFilmIdAndUserId(filmId, userId);
+    public Map<Long, Double> findByFilmIdsAndUserId(Set<Long> filmIds, Long userId) {
+        return ratingRepository.findByFilmIdsAndUserId(filmIds, userId).stream()
+                .collect(Collectors.toMap(RatingProjection::getFilmId, RatingProjection::getRating));
     }
 
     @Transactional(readOnly = true)

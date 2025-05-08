@@ -109,6 +109,11 @@ public class CollectionService {
     }
 
     @Transactional(readOnly = true)
+    public List<Long> findAllCollectionIdsByUser(Long userId) {
+        return collectionRepository.findCollectionIdsByUser(userId);
+    }
+
+    @Transactional(readOnly = true)
     public Collection getOrThrowException(Long filmCollectionId, User user) {
         Collection collection = collectionRepository.findById(filmCollectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Film collection not found"));

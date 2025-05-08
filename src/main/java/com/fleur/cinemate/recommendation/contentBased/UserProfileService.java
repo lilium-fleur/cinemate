@@ -5,11 +5,10 @@ import com.fleur.cinemate.collection.CollectionService;
 import com.fleur.cinemate.collection.item.CollectionItem;
 import com.fleur.cinemate.collection.item.CollectionItemService;
 import com.fleur.cinemate.core.film.Film;
-import com.fleur.cinemate.core.rating.Rating;
 import com.fleur.cinemate.core.rating.RatingService;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenreService;
 import com.fleur.cinemate.core.relations.filmPerson.FilmPersonService;
-import com.fleur.cinemate.core.relations.filmPerson.Role;
+import com.fleur.cinemate.core.relations.filmPerson.model.FilmRole;
 import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.userList.UserListService;
 import com.fleur.cinemate.userList.UserListType;
@@ -19,10 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +31,12 @@ public class UserProfileService {
     private final FilmGenreService filmGenreService;
     private final FilmPersonService filmPersonService;
     private final RatingService ratingService;
-    
+
+    private static final int COLLECTIONS_PAGE_SIZE = 50;
+    private static final int ITEMS_PAGE_SIZE = 100;
+    private static final int MAX_PROFILE_ENTRIES = 300;
+    private static final int FILM_IDS_BATCH_SIZE = 500;
+
     public Map<String, Double> buildUserProfile(User user) {
 
         Map<String, Double> profile = new HashMap<>();
@@ -46,37 +47,67 @@ public class UserProfileService {
         processWatchlistFilms(user, filmContexts);
         processCollectionFilms(user, filmContexts);
 
-        for (FilmContext filmContext : filmContexts.values()) {
-            addFilmFeaturesToProfile(profile, filmContext.getFilm(), filmContext.getMaxWeight());
+        List<Long> filmIds = filmContexts.keySet().stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+
+        int batchSize = FILM_IDS_BATCH_SIZE;
+
+        for (int i = 0; i < filmIds.size(); i += batchSize) {
+            List<Long> batchIds = filmIds.subList(i, Math.min(i + batchSize, filmIds.size()));
+            Set<Long> batchIdSet = new HashSet<>(batchIds);
+
+            Map<Long, List<String>> genreNamesByFilm = filmGenreService.findGenreNamesByFilms(batchIds);
+            Map<Long, List<String>> actorNamesByFilm = filmPersonService
+                    .findPersonNamesByFilmAndRole(batchIds, FilmRole.ACTOR);
+            Map<Long, List<String>> directorNamesByFilm = filmPersonService
+                    .findPersonNamesByFilmAndRole(batchIds, FilmRole.DIRECTOR);
+
+            for (FilmContext filmContext : filmContexts.values()) {
+                Long filmId = filmContext.getFilm().getId();
+                if (batchIdSet.contains(filmId)) {
+                    addFilmFeaturesToProfile(
+                            profile,
+                            genreNamesByFilm.getOrDefault(filmId, List.of()),
+                            actorNamesByFilm.getOrDefault(filmId, List.of()),
+                            directorNamesByFilm.getOrDefault(filmId, List.of()),
+                            filmContext.getMaxWeight());
+                }
+            }
         }
+
         return profile.entrySet().stream()
                 .filter(e -> e.getValue() > 0)
                 .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                .limit(300)
+                .limit(MAX_PROFILE_ENTRIES)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,
                         (e1, e2) -> e1,
                         LinkedHashMap::new));
+
     }
 
 
     private void processCollectionFilms(User user, Map<Film, FilmContext> filmContexts) {
-        Pageable pageable = PageRequest.ofSize(50);
-        Page<Collection> userCollections = collectionService
-                .findAllCollectionsByUser(user,pageable);
+        Pageable pageable = PageRequest.ofSize(COLLECTIONS_PAGE_SIZE);
+        Page<Collection> userCollections;
         do {
+            userCollections = collectionService
+                    .findAllCollectionsByUser(user, pageable);
             for (Collection collection : userCollections.getContent()) {
                 processCollectionItems(user, collection.getId(), filmContexts);
             }
+            pageable = pageable.next();
         } while (userCollections.hasNext());
     }
 
     private void processCollectionItems(User user, Long collectionId, Map<Film, FilmContext> filmContexts) {
-        Pageable pageable = PageRequest.ofSize(100);
-        Page<CollectionItem> items = collectionItemService
-                .findItemsByCollection(collectionId, user, pageable);
+        Pageable pageable = PageRequest.ofSize(ITEMS_PAGE_SIZE);
+        Page<CollectionItem> items;
         do {
+            items = collectionItemService
+                    .findItemsByCollection(collectionId, user, pageable);
             for (CollectionItem collectionItem : items.getContent()) {
                 if (filmContexts.containsKey(collectionItem.getFilm())) {
                     filmContexts.get(collectionItem.getFilm()).setInPersonalCollection(true);
@@ -88,19 +119,20 @@ public class UserProfileService {
                     filmContexts.put(collectionItem.getFilm(), filmContext);
                 }
             }
-            pageable.next();
-        } while(items.hasNext());
+            pageable = pageable.next();
+        } while (items.hasNext());
     }
 
     private void processWatchedFilms(User user, Map<Film, FilmContext> filmContexts) {
-        Pageable pageable = PageRequest.ofSize(100);
-        Page<Film> watchedFilms = userListService.findFilmsByTypeList(user, UserListType.WATCHED, pageable);
-
+        Pageable pageable = PageRequest.ofSize(ITEMS_PAGE_SIZE);
+        Page<Film> watchedFilms;
         do {
+            watchedFilms = userListService.findFilmsByTypeList(user, UserListType.WATCHED, pageable);
+            Map<Long, Double> ratingsByFilm = ratingService.findByFilmIdsAndUserId(
+                    watchedFilms.map(Film::getId).toSet(), user.getId());
+
             for (Film film : watchedFilms.getContent()) {
-                double rating = ratingService.findByFilmIdAndUserId(film.getId(), user.getId())
-                        .map(Rating::getRating)
-                        .orElse(0.0);
+                double rating = ratingsByFilm.getOrDefault(film.getId(), 0.0);
                 if (filmContexts.containsKey(film)) {
                     FilmContext context = filmContexts.get(film);
                     context.setInWatched(true);
@@ -114,13 +146,15 @@ public class UserProfileService {
                     filmContexts.put(film, filmContext);
                 }
             }
+            pageable = pageable.next();
         } while (watchedFilms.hasNext());
     }
 
     private void processWatchlistFilms(User user, Map<Film, FilmContext> filmContexts) {
-        Pageable pageable = PageRequest.ofSize(100);
-        Page<Film> watchlistFilms = userListService.findFilmsByTypeList(user, UserListType.WATCHLIST, pageable);
+        Pageable pageable = PageRequest.ofSize(ITEMS_PAGE_SIZE);
+        Page<Film> watchlistFilms;
         do {
+            watchlistFilms = userListService.findFilmsByTypeList(user, UserListType.WATCHLIST, pageable);
             for (Film film : watchlistFilms.getContent()) {
                 if (filmContexts.containsKey(film)) {
                     filmContexts.get(film).setInWatchlist(true);
@@ -132,15 +166,16 @@ public class UserProfileService {
                     filmContexts.put(film, filmContext);
                 }
             }
-            pageable.next();
+            pageable = pageable.next();
         } while (watchlistFilms.hasNext());
     }
 
     private void processFavoriteFilms(User user, Map<Film, FilmContext> filmContexts) {
-        Pageable pageable = PageRequest.ofSize(100);
-        Page<Film> favoriteFilms = userListService.findFilmsByTypeList(user, UserListType.FAVORITE, pageable);
+        Pageable pageable = PageRequest.ofSize(ITEMS_PAGE_SIZE);
+        Page<Film> favoriteFilms;
 
         do {
+            favoriteFilms = userListService.findFilmsByTypeList(user, UserListType.FAVORITE, pageable);
             for (Film film : favoriteFilms.getContent()) {
                 if (filmContexts.containsKey(film)) {
                     filmContexts.get(film).setInFavourite(true);
@@ -152,7 +187,7 @@ public class UserProfileService {
                     filmContexts.put(film, filmContext);
                 }
             }
-            pageable.next();
+            pageable = pageable.next();
         } while (favoriteFilms.hasNext());
     }
 
@@ -160,17 +195,18 @@ public class UserProfileService {
         return rating / 10.0;
     }
 
-    private void addFilmFeaturesToProfile(Map<String, Double> profile, Film film, double weight) {
-        List<String> genres = filmGenreService.findAllGenreNamesByFilm(film.getId(), Pageable.unpaged());
-        for (String genre : genres) {
+    private void addFilmFeaturesToProfile(Map<String, Double> profile,
+                                          List<String> genreNames,
+                                          List<String> actorNames,
+                                          List<String> directorNames,
+                                          double weight) {
+        for (String genre : genreNames) {
             profile.merge(genre, weight, Double::sum);
         }
-        List<String> actors = filmPersonService.findPersonNamesByFilmAndRole(film.getId(), Role.ACTOR);
-        for (String actor : actors) {
+        for (String actor : actorNames) {
             profile.merge(actor, weight, Double::sum);
         }
-        List<String> directors = filmPersonService.findPersonNamesByFilmAndRole(film.getId(), Role.DIRECTOR);
-        for (String director : directors) {
+        for (String director : directorNames) {
             profile.merge(director, weight, Double::sum);
         }
     }

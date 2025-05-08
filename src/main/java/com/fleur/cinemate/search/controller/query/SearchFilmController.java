@@ -15,11 +15,11 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/films")
+@RequestMapping("api/films/search")
 public class SearchFilmController {
     private final SearchFilmService searchFilmService;
 
-    @PostMapping("/search")
+    @PostMapping
     public ResponseEntity<Page<FilmDto>> searchFilms(
             @RequestBody FilmSearchFilter filter,
             @PageableDefault Pageable pageable)     {

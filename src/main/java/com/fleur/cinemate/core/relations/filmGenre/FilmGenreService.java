@@ -5,10 +5,10 @@ import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
 import com.fleur.cinemate.core.genre.Genre;
 import com.fleur.cinemate.core.genre.GenreRepository;
-import com.fleur.cinemate.core.person.Person;
 import com.fleur.cinemate.core.relations.filmGenre.dto.CreateFilmGenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
-import com.fleur.cinemate.core.relations.filmPerson.FilmPerson;
+import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenre;
+import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenreProjection;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -67,11 +69,10 @@ public class FilmGenreService {
     }
 
     @Transactional(readOnly = true)
-    public List<String> findAllGenreNamesByFilm(Long filmId, Pageable pageable) {
-        return filmGenreRepository.findByFilmId(filmId, Pageable.unpaged()).stream()
-                .map(FilmGenre::getGenre)
-                .map(Genre::getName)
-                .toList();
+    public Map<Long, List<String>> findGenreNamesByFilms(List<Long> filmIds) {
+        return filmGenreRepository.findByFilmIds(filmIds).stream()
+                .collect(Collectors.groupingBy(FilmGenreProjection::getFilmId,
+                        Collectors.mapping(FilmGenreProjection::getGenreName, Collectors.toList())));
     }
 
 }

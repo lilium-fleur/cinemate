@@ -39,12 +39,6 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/refresh"
                         ).permitAll()
-                        .requestMatchers(
-                                "/admin/**"
-                        ).hasRole("ADMIN")
-                        .requestMatchers(
-                                "/api/**"
-                        ).hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement

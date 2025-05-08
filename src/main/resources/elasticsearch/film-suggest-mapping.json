@@ -1,7 +1,48 @@
 {
   "properties": {
+    "id": {
+      "type": "long"
+    },
+    "title": {
+      "type": "text",
+      "analyzer": "standard"
+    },
+    "description": {
+      "type": "text",
+      "analyzer": "standard"
+    },
+    "releaseYear": {
+      "type": "integer"
+    },
+    "rating": {
+      "type": "double"
+    },
     "suggest": {
       "type": "completion",
+      "analyzer": "standard"
+    },
+    "genres": {
+      "type": "keyword",
+      "normalizer": "lowercase"
+    },
+    "actors": {
+      "type": "keyword",
+      "normalizer": "lowercase"
+    },
+    "directors": {
+      "type": "keyword",
+      "normalizer": "lowercase"
+    },
+    "genres_search": {
+      "type": "text",
+      "analyzer": "standard"
+    },
+    "actors_search": {
+      "type": "text",
+      "analyzer": "standard"
+    },
+    "directors_search": {
+      "type": "text",
       "analyzer": "standard"
     }
   }
