@@ -24,6 +24,8 @@ public class RatingRecommendationService {
     private final RatingService ratingService;
     private final CacheableRatingService cacheableRatingService;
 
+    private static final int PAGE_SIZE = 100;
+
 
     public Page<RecommendationDto> getRecommendFilms(User user, Pageable pageable) {
         Map<Film, Double> recommendationsMap = getRecommendations(user.getId());
@@ -46,7 +48,7 @@ public class RatingRecommendationService {
     /**
      * Метод находит фильмы для рекомендации пользователю
      *
-     * @param user                    Пользователь для которого вычисляется рекомендованные фильмы
+     * @param user Пользователь для которого вычисляется рекомендованные фильмы
      * @return Map<Long, Double>, где Long - айди фильма для рекомендации, а Double - предсказанный рейтинг
      */
     private Map<Film, Double> getRecommendations(Long user) {
@@ -54,18 +56,17 @@ public class RatingRecommendationService {
         Double userAvgRating = cacheableRatingService.getAvgRating(user);
         Map<Long, Double> topSimilarUsers = cacheableRatingService.getSimilarUsers(user, 20);
 
-        int page = 0;
-        int size = 100;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<Rating> ratings;
         Map<Film, Double> recommendationsFilms = new HashMap<>();
 
         do {
-            ratings = ratingService.findRatingsExcludeFilms(userFilms, PageRequest.of(page, size));
+            ratings = ratingService.findRatingsExcludeFilms(userFilms, pageable);
             for (Rating rating : ratings.getContent()) {
                 Double predictedRating = predictRating(user, rating.getFilm().getId(), topSimilarUsers);
                 recommendationsFilms.put(rating.getFilm(), predictedRating);
             }
-            page++;
+            pageable = pageable.next();
         } while (ratings.hasNext());
 
         recommendationsFilms = recommendationsFilms.entrySet().stream()
@@ -100,13 +101,13 @@ public class RatingRecommendationService {
                         entry -> cacheableRatingService.getAvgRating(entry.getKey()
                         )));
 
-        int page = 0;
-        int size = 1000;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<Rating> ratings;
         double numerator = 0.0;
         double denominator = 0.0;
         do {
-            ratings = ratingService.findRatingsByFilmAndUsers(film, topSimilarUsers.keySet().stream().toList(), PageRequest.of(page, size));
+            ratings = ratingService.findRatingsByFilmAndUsers(
+                    film, topSimilarUsers.keySet().stream().toList(), pageable);
             for (Rating rating : ratings.getContent()) {
                 Long otherUser = rating.getUser().getId();
                 double similarity = topSimilarUsers.get(otherUser);
@@ -115,7 +116,7 @@ public class RatingRecommendationService {
                 numerator += similarity * (ratingSimilarUser - avgRatingSimilarUser);
                 denominator += Math.abs(similarity);
             }
-            page++;
+            pageable = pageable.next();
         } while (ratings.hasNext());
 
         return denominator == 0 ? avgRatingUser : avgRatingUser + (numerator / denominator);

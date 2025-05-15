@@ -3,11 +3,14 @@ package com.fleur.cinemate.userList;
 import com.fleur.cinemate.__shared.exception.BadRequestException;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmService;
+import com.fleur.cinemate.event.UserProfileUpdatedEvent;
 import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.userList.dto.CreateUserListDto;
 import com.fleur.cinemate.userList.dto.UserListDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,7 +24,9 @@ public class UserListService {
     private final UserListRepository userListRepository;
     private final FilmService filmService;
     private final UserListMapper userListMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = {"userProfile"}, key = "#user")
     @Transactional
     public UserListDto addFilmToList(CreateUserListDto createUserListDto, User user) {
         Film film = filmService.findFilmEntityById(createUserListDto.filmId());
@@ -38,16 +43,20 @@ public class UserListService {
                 .type(userListType)
                 .build();
 
+        eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, user));
+
         return userListMapper.toDto(userListRepository.save(userList));
 
 
     }
 
+    @CacheEvict(cacheNames = {"userProfile"}, key = "#user")
     @Transactional
-    public void removeFilmFromList(Long userListId) {
+    public void removeFilmFromList(Long userListId, User user) {
         UserList userList = userListRepository.findById(userListId)
                 .orElseThrow(() -> new EntityNotFoundException
                         ("Film was not added to this list"));
+        eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, user));
         userListRepository.delete(userList);
     }
 

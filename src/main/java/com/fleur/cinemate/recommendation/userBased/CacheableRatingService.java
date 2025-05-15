@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 public class CacheableRatingService {
     private final RatingService ratingService;
     private final UserSimilarityService userSimilarityService;
+    private static final int PAGE_SIZE = 100;
 
     /**
      * Метод нужен для того, чтобы вычислить средний рейтинг пользователя для всех фильмов
@@ -44,19 +46,18 @@ public class CacheableRatingService {
      */
     @Async
     public void recomputeSimilaritiesAsync(Long user) {
-        int page = 0;
-        int size = 100;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<Rating> allRatings;
         List<Long> userFilms = ratingService.findByUserId(user).stream()
                 .map(rating -> rating.getFilm().getId())
                 .toList();
         do {
-            allRatings = ratingService.findRatingsIncludeFilms(userFilms, PageRequest.of(page, size));
+            allRatings = ratingService.findRatingsIncludeFilms(userFilms, pageable);
             for (Rating rating : allRatings) {
                 Long currentUserId = rating.getUser().getId();
                 updateSimilarities(currentUserId, 20);
             }
-            page++;
+            pageable = pageable.next();
         } while (allRatings.hasNext());
     }
 
@@ -111,18 +112,17 @@ public class CacheableRatingService {
      * значение - значение схожести этого юзера, с тем для кого проводится вычисление
      */
     private Map<Long, Double> computeSimilarities(Long mainUser, Integer countOfUsers) {
-        int page = 0;
-        int size = 100;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<Long> allUsers;
         Map<Long, Double> usersSimilarities = new HashMap<>();
         do {
-            allUsers = ratingService.findDistinctUserIds(PageRequest.of(page, size));
+            allUsers = ratingService.findDistinctUserIds(pageable);
             for (Long user : allUsers) {
                 if (!user.equals(mainUser)) {
                     usersSimilarities.put(user, calculateSimilarity(user, mainUser));
                 }
             }
-            page++;
+            pageable = pageable.next();
         } while (allUsers.hasNext());
 
         usersSimilarities = usersSimilarities.entrySet().stream()

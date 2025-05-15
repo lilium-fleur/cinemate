@@ -7,9 +7,12 @@ import com.fleur.cinemate.collection.item.dto.CollectionItemDto;
 import com.fleur.cinemate.collection.item.dto.CreateCollectionItemDto;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.core.film.FilmRepository;
+import com.fleur.cinemate.event.UserProfileUpdatedEvent;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,9 @@ public class CollectionItemService {
     private final CollectionService collectionService;
     private final CollectionItemMapper collectionItemMapper;
     private final FilmRepository filmRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(cacheNames = {"userProfile"}, key = "#currentUser")
     @Transactional
     public CollectionItemDto addItemToCollection(
             CreateCollectionItemDto createCollectionItemDto,
@@ -52,15 +57,20 @@ public class CollectionItemService {
                 .position(calculatePosition(collection))
                 .build();
 
+        eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, currentUser));
+
         return collectionItemMapper.toDto(collectionItemRepository.save(collectionItem));
     }
 
+    @CacheEvict(cacheNames = {"userProfile"}, key = "#currentUser")
     @Transactional
     public void removeItemByCollection(Long collectionId, Long itemId, User currentUser) {
         collectionService.getOrThrowException(collectionId, currentUser);
         CollectionItem item = collectionItemRepository
                 .findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Film was not added to this collection"));
+
+        eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, currentUser));
 
         collectionItemRepository.delete(item);
     }
