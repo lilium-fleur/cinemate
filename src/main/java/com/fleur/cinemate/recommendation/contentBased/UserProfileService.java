@@ -13,6 +13,7 @@ import com.fleur.cinemate.user.User;
 import com.fleur.cinemate.userList.UserListService;
 import com.fleur.cinemate.userList.UserListType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +38,8 @@ public class UserProfileService {
     private static final int MAX_PROFILE_ENTRIES = 300;
     private static final int FILM_IDS_BATCH_SIZE = 500;
 
+    @Cacheable(value = "userProfile", key = "#user")
     public Map<String, Double> buildUserProfile(User user) {
-
         Map<String, Double> profile = new HashMap<>();
         Map<Film, FilmContext> filmContexts = new HashMap<>();
 
@@ -109,15 +110,10 @@ public class UserProfileService {
             items = collectionItemService
                     .findItemsByCollection(collectionId, user, pageable);
             for (CollectionItem collectionItem : items.getContent()) {
-                if (filmContexts.containsKey(collectionItem.getFilm())) {
-                    filmContexts.get(collectionItem.getFilm()).setInPersonalCollection(true);
-                } else {
-                    FilmContext filmContext = FilmContext.builder()
-                            .film(collectionItem.getFilm())
-                            .inPersonalCollection(true)
-                            .build();
-                    filmContexts.put(collectionItem.getFilm(), filmContext);
-                }
+                filmContexts.computeIfAbsent(collectionItem.getFilm(), film -> FilmContext.builder()
+                                .film(collectionItem.getFilm())
+                                .build())
+                        .setInPersonalCollection(true);
             }
             pageable = pageable.next();
         } while (items.hasNext());
@@ -133,6 +129,7 @@ public class UserProfileService {
 
             for (Film film : watchedFilms.getContent()) {
                 double rating = ratingsByFilm.getOrDefault(film.getId(), 0.0);
+
                 if (filmContexts.containsKey(film)) {
                     FilmContext context = filmContexts.get(film);
                     context.setInWatched(true);

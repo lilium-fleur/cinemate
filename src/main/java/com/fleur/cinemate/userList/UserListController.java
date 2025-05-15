@@ -27,8 +27,9 @@ public class UserListController {
 
     @DeleteMapping("/{userListId}")
     public ResponseEntity<Void> deleteFilmFromList(
+            @AuthenticationPrincipal User user,
             @PathVariable Long userListId){
-        userListService.removeFilmFromList(userListId);
+        userListService.removeFilmFromList(userListId, user);
         return ResponseEntity.noContent().build();
     }
 

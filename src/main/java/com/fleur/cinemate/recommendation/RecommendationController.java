@@ -1,6 +1,7 @@
 package com.fleur.cinemate.recommendation;
 
 import com.fleur.cinemate.recommendation.contentBased.ContentRecommendationService;
+import com.fleur.cinemate.recommendation.contentBased.UserProfileService;
 import com.fleur.cinemate.recommendation.dto.RecommendationDto;
 import com.fleur.cinemate.recommendation.userBased.RatingRecommendationService;
 import com.fleur.cinemate.user.User;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +24,7 @@ import java.util.List;
 public class RecommendationController {
     private final RatingRecommendationService ratingRecommendationService;
     private final ContentRecommendationService contentRecommendationService;
+    private final UserProfileService userProfileService;
 
     @GetMapping("/user-based")
     public ResponseEntity<Page<RecommendationDto>> getRecommendations(
@@ -36,5 +39,10 @@ public class RecommendationController {
         return ResponseEntity.ok(contentRecommendationService.getRecommendationFilms(user));
     }
 
+    @GetMapping("/profile")
+    public ResponseEntity<Map<String, Double>> getRecommendationProfile(
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userProfileService.buildUserProfile(user));
+    }
 
 }

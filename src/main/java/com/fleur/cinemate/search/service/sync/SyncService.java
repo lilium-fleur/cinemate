@@ -14,18 +14,19 @@ import java.time.Instant;
 public abstract class SyncService<T> {
     private final ESSyncDateRepository esSyncDateRepository;
 
+    private static final int PAGE_SIZE = 100;
+
     protected SyncService(ESSyncDateRepository esSyncDateRepository) {
         this.esSyncDateRepository = esSyncDateRepository;
     }
 
     public void syncAll() {
-        int page = 0;
-        int size = 100;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<T> entityPage;
         do {
-            entityPage = findAllEntities(PageRequest.of(page, size));
+            entityPage = findAllEntities(pageable);
             saveToIndex(entityPage);
-            page++;
+            pageable = pageable.next();
         } while (entityPage.hasNext());
 
         esSyncDateRepository.save(
@@ -36,16 +37,15 @@ public abstract class SyncService<T> {
     }
 
     public void incrementalSync() {
-        int page = 0;
-        int size = 100;
+        Pageable pageable = PageRequest.ofSize(PAGE_SIZE);
         Page<T> entityPage;
         Instant lastSyncTime = esSyncDateRepository.findFirstByIndexNameOrderByLastSyncTime(getIndexName())
                 .map(ESSyncDate::getLastSyncTime)
                 .orElse(Instant.EPOCH);
         do {
-            entityPage = findEntitiesSinceDate(lastSyncTime, PageRequest.of(page, size));
+            entityPage = findEntitiesSinceDate(lastSyncTime, pageable);
             saveToIndex(entityPage);
-            page++;
+            pageable = pageable.next();
         } while (entityPage.hasNext());
 
         esSyncDateRepository.save(
