@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserSimilarityRepository extends JpaRepository<UserSimilarity, Long> {
+public interface UserSimilarityRepository extends JpaRepository<UserSimilarity, UserSimilarityId> {
 
     @Query("SELECT us FROM UserSimilarity us " +
             "WHERE us.user1.id = : user1Id " +
@@ -20,7 +20,6 @@ public interface UserSimilarityRepository extends JpaRepository<UserSimilarity, 
             "WHERE us.user1.id = :userId " +
             "OR us.user2.id = :userId")
     List<UserSimilarity> findByUserId(Long userId);
-
 
     @Modifying
     @Query("DELETE FROM UserSimilarity us " +

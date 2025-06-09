@@ -34,7 +34,7 @@ public class SyncCollectionService extends SyncService<Collection> {
 
     @Override
     protected Page<Collection> findAllEntities(Pageable pageable) {
-        return collectionService.findAllCollection(pageable);
+        return collectionService.findAllPublicCollection(pageable);
     }
 
     @Override

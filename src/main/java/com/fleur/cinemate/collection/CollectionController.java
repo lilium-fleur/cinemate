@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/film-collections")
+@RequestMapping("/api/collections")
 public class CollectionController {
 
     private final CollectionService collectionService;
@@ -26,28 +26,30 @@ public class CollectionController {
     }
 
 
-    @GetMapping("/{filmCollectionId}")
+    @GetMapping("/{collectionId}")
     public ResponseEntity<CollectionDto> getCollectionById(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(collectionService.findCollectionById(filmCollectionId, user));
+        return ResponseEntity.ok(collectionService.findCollectionById(collectionId, user));
     }
 
-    @PutMapping("/{filmCollectionId}")
+
+    @PutMapping("/{collectionId}")
     public ResponseEntity<CollectionDto> updateCollection(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @RequestBody UpdateCollectionDto updateCollectionDto,
             @AuthenticationPrincipal User user){
         return ResponseEntity.ok(
                 collectionService.updateCollection(
-                        updateCollectionDto, filmCollectionId, user));
+                        updateCollectionDto, collectionId, user));
     }
 
-    @DeleteMapping("/{filmCollectionId}")
+
+    @DeleteMapping("/{collectionId}")
     public ResponseEntity<CollectionDto> deleteCollection(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @AuthenticationPrincipal User user){
-        collectionService.deleteCollection(filmCollectionId, user);
+        collectionService.deleteCollection(collectionId, user);
         return ResponseEntity.noContent().build();
     }
 

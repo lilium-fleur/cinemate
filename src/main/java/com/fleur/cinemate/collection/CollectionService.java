@@ -35,7 +35,7 @@ public class CollectionService {
         Collection collection = Collection.builder()
                 .name(createCollectionDto.name())
                 .description(createCollectionDto.description())
-                .user(user)
+                .author(user)
                 .isPublic(createCollectionDto.isPublic())
                 .build();
 
@@ -60,27 +60,33 @@ public class CollectionService {
         eventPublisher.publishEvent(new RecordDeletedEvent(this, collectionId, "Collection"));
     }
 
+
     @Transactional(readOnly = true)
-    public List<CollectionDto> findAllCollectionById(List<Long> ids){
+    public List<CollectionDto> findAllCollectionById(List<Long> ids) {
         return collectionRepository.findAllById(ids).stream()
                 .map(collectionMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public Page<Collection> findAllCollection(Pageable pageable){
-        return collectionRepository.findAll(pageable);
+    public Page<Collection> findAllPublicCollection(Pageable pageable) {
+        return collectionRepository.findAllPublic(pageable);
     }
 
     @Transactional(readOnly = true)
-    public Page<Collection> findModifiedSince(Instant since, Pageable pageable){
+    public Page<Collection> findModifiedSince(Instant since, Pageable pageable) {
         return collectionRepository.findModifiedSince(since, pageable);
     }
 
     @Transactional(readOnly = true)
-    public Collection findPublicCollectionById(Long collectionId){
-        return collectionRepository.findPublicById(collectionId)
+    public Collection findPublicCollectionById(Long collectionId, Long userId) {
+        Collection collection = collectionRepository.findPublicById(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
+
+        if (!collection.getAuthor().getId().equals(userId) && !collection.getIsPublic()) {
+            throw new AccessDeniedException("Permission denied");
+        }
+        return collection;
     }
 
 
@@ -88,24 +94,16 @@ public class CollectionService {
     public CollectionDto findCollectionById(Long filmCollectionId, User currentUser) {
         Collection collection = collectionRepository.findById(filmCollectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Film collection not found"));
-        if(!collection.getIsPublic() && !collection.getUser().getId().equals(currentUser.getId())) {
+        if (!collection.getIsPublic() && !collection.getAuthor().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Permission not found");
         }
         return collectionMapper.toDto(collection);
     }
 
-    @Transactional(readOnly = true)
-    public Page<CollectionDto> findCollectionsByUserForAll(User currentUser, Long userId, Pageable pageable) {
-        if(currentUser.getId().equals(userId)) {
-            return findCollectionsForCurrentUser(currentUser, pageable);
-        }
-        return findPublicCollectionsByUser(userId, pageable);
-    }
-
 
     @Transactional(readOnly = true)
     public Page<Collection> findAllCollectionsByUser(User user, Pageable pageable) {
-        return collectionRepository.findAllByUser(user, pageable);
+        return collectionRepository.findAllByAuthor(user, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -117,14 +115,14 @@ public class CollectionService {
     public Collection getOrThrowException(Long filmCollectionId, User user) {
         Collection collection = collectionRepository.findById(filmCollectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Film collection not found"));
-        if(!collection.getUser().getId().equals(user.getId())) {
+        if (!collection.getAuthor().getId().equals(user.getId())) {
             throw new AccessDeniedException("Permission not found");
         }
         return collection;
     }
 
     private Page<CollectionDto> findCollectionsForCurrentUser(User currentUser, Pageable pageable) {
-        return collectionRepository.findAllByUser(currentUser, pageable)
+        return collectionRepository.findAllByAuthor(currentUser, pageable)
                 .map(collectionMapper::toDto);
     }
 

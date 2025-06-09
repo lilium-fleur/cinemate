@@ -4,8 +4,12 @@ import com.fleur.cinemate.__shared.model.IdEntity;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
@@ -36,6 +40,6 @@ public class UserList extends IdEntity {
     private UserListType type;
 
     @Column(nullable = false)
-    @Builder.Default
-    private Instant addedAt = Instant.now();
+    @CreationTimestamp
+    private Instant addedAt;
 }

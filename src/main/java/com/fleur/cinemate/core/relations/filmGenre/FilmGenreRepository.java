@@ -1,6 +1,7 @@
 package com.fleur.cinemate.core.relations.filmGenre;
 
 import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenre;
+import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenreId;
 import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenreProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FilmGenreRepository extends JpaRepository<FilmGenre, Long> {
+public interface FilmGenreRepository extends JpaRepository<FilmGenre, FilmGenreId> {
 
     Optional<FilmGenre> findByFilmIdAndGenreId(Long filmId, Long genreId);
 

@@ -13,10 +13,10 @@ import java.util.Optional;
 
 @Repository
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
-    Page<Collection> findAllByUser(User user, Pageable pageable);
+    Page<Collection> findAllByAuthor(User user, Pageable pageable);
 
     @Query("SELECT c FROM Collection c " +
-            "WHERE c.user.id = :userId " +
+            "WHERE c.author.id = :userId " +
             "AND c.isPublic = true")
     Page<Collection> findAllPublicByUserId(Long userId, Pageable pageable);
 
@@ -35,6 +35,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Page<Collection> findModifiedSince(Instant sinceDate, Pageable pageable);
 
     @Query("SELECT c.id FROM Collection c " +
-            "WHERE c.user.id = :userId")
+            "WHERE c.author.id = :userId")
     List<Long> findCollectionIdsByUser(Long userId);
 }

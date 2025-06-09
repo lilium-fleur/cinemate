@@ -14,45 +14,45 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/film-collections/{filmCollectionId}/items")
+@RequestMapping("/api/collections/{collectionId}/items")
 public class CollectionItemController {
     private final CollectionItemService collectionItemService;
 
     @PostMapping
     public ResponseEntity<CollectionItemDto> addFilmToCollection(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @RequestBody @Valid CreateCollectionItemDto createCollectionItemDto,
             @AuthenticationPrincipal User user){
-        return ResponseEntity.ok(collectionItemService.addItemToCollection(createCollectionItemDto, filmCollectionId, user));
+        return ResponseEntity.ok(collectionItemService.addItemToCollection(createCollectionItemDto, collectionId, user));
     }
 
     @GetMapping
     public ResponseEntity<Page<CollectionItemDto>> getCollectionItems(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @AuthenticationPrincipal User user,
             @PageableDefault(sort = "position") Pageable pageable){
-        return ResponseEntity.ok(collectionItemService.findItemsDtoByCollection(filmCollectionId, user, pageable));
+        return ResponseEntity.ok(collectionItemService.findItemsDtoByCollection(collectionId, user, pageable));
     }
 
 
     @PutMapping("/{itemId}")
     public ResponseEntity<CollectionItemDto> changePositionCollectionItem(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @PathVariable Long itemId,
             @AuthenticationPrincipal User user,
             @RequestParam(name = "target_position") Integer targetPosition){
         return ResponseEntity.ok(
                 collectionItemService.changePositionCollectionItem(
-                        filmCollectionId, user, itemId, targetPosition));
+                        collectionId, user, itemId, targetPosition));
     }
 
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> removeFilmFromCollection(
-            @PathVariable Long filmCollectionId,
+            @PathVariable Long collectionId,
             @PathVariable Long itemId,
             @AuthenticationPrincipal User user){
-        collectionItemService.removeItemByCollection(filmCollectionId, itemId, user);
+        collectionItemService.removeItemByCollection(collectionId, itemId, user);
         return ResponseEntity.noContent().build();
     }
 }

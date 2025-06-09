@@ -1,44 +1,40 @@
-package com.fleur.cinemate.collection.item;
+package com.fleur.cinemate.collection.userCollection;
 
-
-import com.fleur.cinemate.__shared.model.IdEntity;
 import com.fleur.cinemate.collection.Collection;
-import com.fleur.cinemate.core.film.Film;
+import com.fleur.cinemate.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(
-        name = "collection_items",
+        name = "collections",
         uniqueConstraints = @UniqueConstraint(
-                columnNames = {"collection_id", "film_id"}
-        ))
-public class CollectionItem extends IdEntity {
+                columnNames = {"user_id, collection_id"})
+)
+@IdClass(UserCollectionId.class)
+public class UserCollection {
 
+    @Id
+    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    private User user;
+
+    @Id
     @JoinColumn(name = "collection_id", nullable = false)
     @ManyToOne
     private Collection collection;
 
-    @JoinColumn(name = "film_id", nullable = false)
-    @ManyToOne
-    private Film film;
-
     @Column(nullable = false)
     @CreationTimestamp
     private Instant addedAt;
-
-    @Column(nullable = false)
-    private Integer position;
 }
