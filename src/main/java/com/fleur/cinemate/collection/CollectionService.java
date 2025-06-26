@@ -1,6 +1,7 @@
 package com.fleur.cinemate.collection;
 
 import com.fleur.cinemate.collection.dto.CollectionDto;
+import com.fleur.cinemate.collection.dto.CollectionDtoWithSize;
 import com.fleur.cinemate.collection.dto.CreateCollectionDto;
 import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
 import com.fleur.cinemate.event.RecordDeletedEvent;
@@ -62,14 +63,14 @@ public class CollectionService {
 
 
     @Transactional(readOnly = true)
-    public List<CollectionDto> findAllCollectionById(List<Long> ids) {
+    public List<CollectionDto> findAllCollectionByIds(List<Long> ids) {
         return collectionRepository.findAllById(ids).stream()
                 .map(collectionMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public Page<Collection> findAllPublicCollection(Pageable pageable) {
+    public Page<Collection> findAllPublicCollectionEntities(Pageable pageable) {
         return collectionRepository.findAllPublic(pageable);
     }
 
@@ -91,13 +92,28 @@ public class CollectionService {
 
 
     @Transactional(readOnly = true)
-    public CollectionDto findCollectionById(Long filmCollectionId, User currentUser) {
-        Collection collection = collectionRepository.findById(filmCollectionId)
-                .orElseThrow(() -> new EntityNotFoundException("Film collection not found"));
+    public CollectionDtoWithSize findCollectionByIdWithSize(Long collectionId, User currentUser) {
+        CollectionDtoWithSize collectionDto = collectionRepository.findPublicByIdWithSize(collectionId)
+                .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
+        if (!collectionDto.getIsPublic() && !collectionDto.getAuthorId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Permission not found");
+        }
+        return collectionDto;
+    }
+
+    @Transactional(readOnly = true)
+    public CollectionDto findCollectionById(Long collectionId, User currentUser) {
+        Collection collection = collectionRepository.findById(collectionId)
+                .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
         if (!collection.getIsPublic() && !collection.getAuthor().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Permission not found");
         }
         return collectionMapper.toDto(collection);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CollectionDtoWithSize> findAllPublicCollection(Pageable pageable) {
+        return collectionRepository.findAllPublicWithSize(pageable);
     }
 
 
@@ -119,15 +135,5 @@ public class CollectionService {
             throw new AccessDeniedException("Permission not found");
         }
         return collection;
-    }
-
-    private Page<CollectionDto> findCollectionsForCurrentUser(User currentUser, Pageable pageable) {
-        return collectionRepository.findAllByAuthor(currentUser, pageable)
-                .map(collectionMapper::toDto);
-    }
-
-    private Page<CollectionDto> findPublicCollectionsByUser(Long userId, Pageable pageable) {
-        return collectionRepository.findAllPublicByUserId(userId, pageable)
-                .map(collectionMapper::toDto);
     }
 }

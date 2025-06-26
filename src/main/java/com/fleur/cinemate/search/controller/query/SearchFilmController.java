@@ -2,7 +2,7 @@ package com.fleur.cinemate.search.controller.query;
 
 
 import com.fleur.cinemate.core.film.dto.FilmDto;
-import com.fleur.cinemate.search.dto.FilmSearchFilter;
+import com.fleur.cinemate.search.dto.FilmFilter;
 import com.fleur.cinemate.search.service.query.SearchFilmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,7 +21,7 @@ public class SearchFilmController {
 
     @PostMapping
     public ResponseEntity<Page<FilmDto>> searchFilms(
-            @RequestBody FilmSearchFilter filter,
+            @RequestBody FilmFilter filter,
             @PageableDefault Pageable pageable)     {
         return ResponseEntity.ok(searchFilmService.findFilmsByFilters(filter, pageable));
     }

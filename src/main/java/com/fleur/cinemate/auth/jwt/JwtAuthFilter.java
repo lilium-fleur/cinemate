@@ -75,6 +75,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private boolean isPublicEndpoint(HttpServletRequest request) {
         return request.getRequestURI().contains("/api/auth/login") ||
                 request.getRequestURI().contains("/api/auth/register") ||
-                request.getRequestURI().contains("/api/auth/refresh");
+                request.getRequestURI().contains("/api/auth/refresh") ||
+                request.getRequestURI().contains("/api/collections") ||
+                request.getRequestURI().contains("/api/films");
     }
 }

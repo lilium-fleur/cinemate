@@ -8,14 +8,18 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CollectionMapper {
 
-    @Mapping(target = "userId", source = "user",  qualifiedByName = "toUserId")
+    @Mapping(target = "authorId", source = "author", qualifiedByName = "toAuthorId")
     CollectionDto toDto(Collection collection);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "lastModifiedAt", ignore = true)
+    @Mapping(target = "author", ignore = true)
     Collection updateEntityFromDto(UpdateCollectionDto updateCollectionDto,
                                    @MappingTarget Collection collection);
 
-    @Named("toUserId")
-    default Long toUserId(User user){
+    @Named("toAuthorId")
+    default Long toAuthorId(User user) {
         return user.getId();
     }
 }

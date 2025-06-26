@@ -39,4 +39,8 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
     Set<Long> findDistinctByCollectionIdIn(List<Long> collectionIds);
 
     Optional<CollectionItem> findByCollectionIdAndFilmId(Long collectionId, Long filmId);
+
+    @Query("SELECT COUNT(ci.id) FROM CollectionItem ci " +
+            "WHERE ci.collection.id = :collectionId")
+    Long findItemsCountByCollectionId(Long collectionId);
 }

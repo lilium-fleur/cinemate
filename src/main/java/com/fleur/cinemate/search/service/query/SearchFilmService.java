@@ -1,12 +1,14 @@
 package com.fleur.cinemate.search.service.query;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.search.Suggester;
 import com.fleur.cinemate.core.film.FilmService;
 import com.fleur.cinemate.core.film.dto.FilmDto;
 import com.fleur.cinemate.search.document.FilmDocument;
-import com.fleur.cinemate.search.dto.FilmSearchFilter;
+import com.fleur.cinemate.search.dto.FilmFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -34,7 +36,7 @@ public class SearchFilmService {
     private final Integer SIZE_OF_SUGGESTIONS = 4;
 
 
-    public Page<FilmDto> findFilmsByFilters(FilmSearchFilter filter, Pageable pageable) {
+    public Page<FilmDto> findFilmsByFilters(FilmFilter filter, Pageable pageable) {
         System.out.println(filter.query());
         List<Query> filters = new ArrayList<>();
         Query searchQuery;
@@ -83,20 +85,14 @@ public class SearchFilmService {
             filters.add(yearFilter);
         }
 
-        Query scoredQuery = FunctionScoreQuery.of(f -> f
-                        .query(searchQuery)
-                        .functions(FunctionScore.of(fs -> fs
-                                .fieldValueFactor(FieldValueFactorScoreFunction.of(fvf -> fvf
-                                        .field("rating")
-                                        .factor(1.2)
-                                        .modifier(FieldValueFactorModifier.Log1p))))))
-                ._toQuery();
-
 
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(q -> q.bool(bool -> bool
-                        .must(scoredQuery)
                         .filter(filters)))
+                .withSort(SortOptions.of(s -> s
+                        .field(f -> f
+                                .field(filter.sortBy().getValue())
+                                .order(filter.sortBy().getValue().equals("title") ? SortOrder.Asc : SortOrder.Desc))))
                 .withPageable(pageable)
                 .build();
 

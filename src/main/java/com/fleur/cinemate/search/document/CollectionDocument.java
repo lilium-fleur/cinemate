@@ -8,6 +8,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.data.elasticsearch.annotations.Setting;
 
+import java.time.Instant;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
@@ -26,4 +28,9 @@ public class CollectionDocument {
     @Field(type = FieldType.Text)
     private String description;
 
+    @Field(type = FieldType.Long)
+    private Long size;
+
+    @Field(type = FieldType.Date, format = {})
+    private Instant createdAt;
 }

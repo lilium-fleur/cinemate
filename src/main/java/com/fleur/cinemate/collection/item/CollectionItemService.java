@@ -129,7 +129,7 @@ public class CollectionItemService {
             User currentUser,
             Pageable pageable) {
 
-        Long collectionId = collectionService.findCollectionById(filmCollectionId, currentUser).id();
+        Long collectionId = collectionService.findCollectionByIdWithSize(filmCollectionId, currentUser).getId();
         return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable);
     }
 
@@ -139,11 +139,8 @@ public class CollectionItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<Long> findFilmIdsByCollection(
-            Long collectionId){
-        return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, Pageable.unpaged())
-                .map(collectionItem -> collectionItem.getFilm().getId())
-                .toList();
+    public Long findItemsCountByCollectionId(Long collectionId) {
+        return collectionItemRepository.findItemsCountByCollectionId(collectionId);
     }
 
 

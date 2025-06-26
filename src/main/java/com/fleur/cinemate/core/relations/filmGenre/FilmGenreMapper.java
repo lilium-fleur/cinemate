@@ -11,7 +11,7 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface FilmGenreMapper {
     @Mapping(target = "filmId", source = "film", qualifiedByName = "toFilmId")
-    @Mapping(target = "genreId", source = "genre", qualifiedByName = "toGenreId")
+    @Mapping(target = "genreName", source = "genre", qualifiedByName = "toGenreName")
     FilmGenreDto toDto(FilmGenre filmGenre);
 
 
@@ -20,8 +20,8 @@ public interface FilmGenreMapper {
         return film.getId();
     }
 
-    @Named("toGenreId")
-    default Long toGenreId(Genre genre) {
-        return genre.getId();
+    @Named("toGenreName")
+    default String toGenreName(Genre genre) {
+        return genre.getName();
     }
 }

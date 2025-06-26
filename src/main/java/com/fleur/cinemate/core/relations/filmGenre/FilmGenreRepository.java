@@ -19,7 +19,7 @@ public interface FilmGenreRepository extends JpaRepository<FilmGenre, FilmGenreI
 
     Page<FilmGenre> findByGenreId(Long genreId, Pageable pageable);
 
-    Page<FilmGenre> findByFilmId(Long filmId, Pageable pageable);
+    List<FilmGenre> findByFilmId(Long filmId);
 
     @Query("SELECT fg.film.id AS filmId, g.name AS genreName " +
             "FROM FilmGenre fg JOIN fg.genre g " +

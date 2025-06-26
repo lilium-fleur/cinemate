@@ -17,7 +17,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 @Table(
-        name = "collections",
+        name = "user_collections",
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {"user_id, collection_id"})
 )

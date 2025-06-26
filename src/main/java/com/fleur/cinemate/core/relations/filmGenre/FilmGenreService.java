@@ -63,9 +63,10 @@ public class FilmGenreService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FilmGenreDto> findAllByFilm(Long filmId, Pageable pageable) {
-        return filmGenreRepository.findByFilmId(filmId, pageable)
-                .map(filmGenreMapper::toDto);
+    public List<FilmGenreDto> findAllByFilm(Long filmId) {
+        return filmGenreRepository.findByFilmId(filmId).stream()
+                .map(filmGenreMapper::toDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)

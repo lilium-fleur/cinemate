@@ -7,8 +7,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
-      - elasticsearch
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     environment:
         - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cinemate
         - SPRING_DATASOURCE_USERNAME=postgres
@@ -16,10 +18,15 @@ services:
         - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
     networks:
       - app-network
-    command: >
-      sh -c "until curl -s http://elasticsearch:9200; do echo 'Waiting for Elasticsearch...'; sleep 2; done;
-             until pg_isready -h db -p 5432; do echo 'Waiting for PostgreSQL...'; sleep 2; done;
-             java -jar /app/app.jar"
+    command: java -jar /app/app.jar
+  client:
+    build:
+      context: ../cinemate-front
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app-network
 
   db:
     image: postgres:17
