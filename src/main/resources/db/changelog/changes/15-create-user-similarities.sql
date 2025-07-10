@@ -7,5 +7,5 @@ CREATE TABLE user_similarities
     user2_id   BIGINT REFERENCES users (id) NOT NULL,
     similarity DOUBLE PRECISION             NOT NULL,
     PRIMARY KEY (user1_id, user2_id)
-)
+);
 --rollback DROP TABLE user_similarities

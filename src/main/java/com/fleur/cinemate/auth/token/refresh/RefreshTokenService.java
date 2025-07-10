@@ -33,13 +33,13 @@ public class RefreshTokenService extends TokenService<RefreshToken> {
     }
 
     @Override
-    public boolean isTokenValid(String token, String fingerprint) {
+    public boolean isTokenInvalid(String token, String fingerprint) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new EntityNotFoundException("Token not found"));
 
-        return refreshToken.getUserSession().getFingerprint().equals(fingerprint) &&
-                refreshToken.getExpiresAt().isAfter(Instant.now()) &&
-                !refreshToken.getIsRevoked();
+        return !refreshToken.getUserSession().getFingerprint().equals(fingerprint) ||
+                !refreshToken.getExpiresAt().isAfter(Instant.now()) ||
+                refreshToken.getIsRevoked();
     }
 
     @Override

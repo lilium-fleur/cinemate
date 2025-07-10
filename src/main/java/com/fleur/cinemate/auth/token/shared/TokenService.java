@@ -33,7 +33,6 @@ public abstract class TokenService<T extends TokenEntity> {
                     .build(),
                 expiresAt
         );
-
         return tokenRepository.save(token);
     }
 
@@ -53,7 +52,7 @@ public abstract class TokenService<T extends TokenEntity> {
                 .orElseThrow(() -> new EntityNotFoundException("Token not found"));
     }
 
-    public abstract boolean isTokenValid(String token, String fingerprint);
+    public abstract boolean isTokenInvalid(String token, String fingerprint);
     protected abstract long getExpirationTime();
     protected abstract T createTokenEntity(CreateTokenDto createTokenDto, Instant expiresAt);
     protected abstract String generateToken(User user);

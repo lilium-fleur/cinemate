@@ -1,7 +1,7 @@
---liquibase formatted sql
+-- liquibase formatted sql
 
 
---changelog fleur:1
+--changeset fleur:1
 CREATE TABLE user_collections
 (
     user_id       BIGINT REFERENCES users (id) ON DELETE CASCADE       NOT NULL,

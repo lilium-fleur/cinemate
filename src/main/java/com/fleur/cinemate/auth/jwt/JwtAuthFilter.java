@@ -49,7 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String fingerprint = userSessionService.getFingerprint(request);
             String username = jwtTokenUtil.extractUsername(token);
 
-            if(StringUtils.isBlank(username) && !accessTokenService.isTokenValid(token, fingerprint)) {
+            if (StringUtils.isBlank(username) || accessTokenService.isTokenInvalid(token, fingerprint)) {
                 throw new JwtException("Invalid JWT token");
             }
 
@@ -76,7 +76,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return request.getRequestURI().contains("/api/auth/login") ||
                 request.getRequestURI().contains("/api/auth/register") ||
                 request.getRequestURI().contains("/api/auth/refresh") ||
-                request.getRequestURI().contains("/api/collections") ||
                 request.getRequestURI().contains("/api/films");
     }
 }

@@ -34,15 +34,15 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthDto> refresh(
-            @CookieValue("__tar") String refreshToken,
-            @CookieValue("__paf") String fingerprint){
+            @CookieValue(name = "__tar") String refreshToken,
+            @CookieValue(name = "__paf") String fingerprint) {
         return ResponseEntity.ok(authService.refresh(refreshToken, fingerprint));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue("__tar") String refreshToken,
-            @CookieValue("__paf") String fingerprint,
+            @CookieValue(name = "__tar") String refreshToken,
+            @CookieValue(name = "__paf") String fingerprint,
             HttpServletResponse response){
         authService.logout(refreshToken, fingerprint, response);
         return ResponseEntity.noContent().build();

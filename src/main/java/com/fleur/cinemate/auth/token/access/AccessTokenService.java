@@ -42,13 +42,13 @@ public class AccessTokenService extends TokenService<AccessToken> {
     }
 
     @Override
-    public boolean isTokenValid(String token, String fingerprint) {
+    public boolean isTokenInvalid(String token, String fingerprint) {
         AccessToken accessToken = accessTokenRepository.findByToken(token)
                 .orElseThrow(() -> new EntityNotFoundException("Token not found"));
 
-        return accessToken.getUserSession().getFingerprint().equals(fingerprint) &&
-                accessToken.getExpiresAt().isAfter(Instant.now()) &&
-                !accessToken.getIsRevoked();
+        return !accessToken.getUserSession().getFingerprint().equals(fingerprint) ||
+                !accessToken.getExpiresAt().isAfter(Instant.now()) ||
+                accessToken.getIsRevoked();
 
     }
 

@@ -68,7 +68,7 @@ public class AuthService {
     public void logout(String refreshToken, String fingerprint, HttpServletResponse response) {
         RefreshToken refreshTokenEntity = refreshTokenService.findByToken(refreshToken);
 
-        if(!refreshTokenService.isTokenValid(refreshToken, fingerprint)){
+        if (refreshTokenService.isTokenInvalid(refreshToken, fingerprint)) {
             userSessionService.deactivateUserSession(refreshTokenEntity.getUserSession());
 
             throw new AccessDeniedException("Invalid refresh token");
@@ -100,14 +100,17 @@ public class AuthService {
 
     @Transactional
     public AuthDto refresh(String refreshToken, String fingerprint) {
+        System.out.println("REFRESHING TOKEN STARTED");
+
         RefreshToken refreshTokenEntity = refreshTokenService.findByToken(refreshToken);
 
-        if (!refreshTokenService.isTokenValid(refreshToken, fingerprint)) {
+        if (refreshTokenService.isTokenInvalid(refreshToken, fingerprint)) {
             userSessionService.deactivateUserSession(refreshTokenEntity.getUserSession());
 
             throw new AccessDeniedException("Invalid refresh token");
         }
 
+        System.out.println("BEFORE REVOKE ACCESS TOKEN IN REFRESH METHOD");
         accessTokenService.revokeActiveTokens(refreshTokenEntity.getUserSession());
 
         CreateTokenDto createTokenDto = CreateTokenDto.builder()
@@ -115,6 +118,7 @@ public class AuthService {
                 .user(refreshTokenEntity.getUserSession().getUser())
                 .build();
 
+        System.out.println("CREATING access TOKEN IN REFRESH METHOD");
         TokenEntity accessToken = accessTokenService.createToken(createTokenDto);
 
         return AuthDto.builder()
