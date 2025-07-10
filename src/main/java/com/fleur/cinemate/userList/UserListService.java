@@ -46,8 +46,6 @@ public class UserListService {
         eventPublisher.publishEvent(new UserProfileUpdatedEvent(this, user));
 
         return userListMapper.toDto(userListRepository.save(userList));
-
-
     }
 
     @CacheEvict(cacheNames = {"userProfile"}, key = "#user")
@@ -65,7 +63,6 @@ public class UserListService {
         UserListType userListType = UserListType.fromString(listType);
         return userListRepository.findByUserAndType(user, userListType, pageable)
                 .map(userListMapper::toDto);
-
     }
 
     @Transactional(readOnly = true)

@@ -35,14 +35,12 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.findAllPublicCollection(pageable));
     }
 
-
     @GetMapping("/{collectionId}")
-    public ResponseEntity<CollectionDtoWithSize> getCollectionById(
+    public ResponseEntity<CollectionDtoWithSize> getPublicCollectionById(
             @PathVariable Long collectionId,
             @AuthenticationPrincipal User user){
         return ResponseEntity.ok(collectionService.findCollectionByIdWithSize(collectionId, user));
     }
-
 
     @PutMapping("/{collectionId}")
     public ResponseEntity<CollectionDto> updateCollection(

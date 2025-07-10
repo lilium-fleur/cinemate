@@ -1,7 +1,7 @@
 package com.fleur.cinemate.core.rating;
 
 
-import com.fleur.cinemate.__shared.model.BaseEntity;
+import com.fleur.cinemate.__shared.model.IdEntity;
 import com.fleur.cinemate.core.film.Film;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.*;
@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
 
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
@@ -22,7 +25,7 @@ import lombok.experimental.SuperBuilder;
         uniqueConstraints = @UniqueConstraint(
                 columnNames = {"user_id", "film_id"})
 )
-public class Rating extends BaseEntity {
+public class Rating extends IdEntity {
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
@@ -35,4 +38,7 @@ public class Rating extends BaseEntity {
     @Column(nullable = false)
     private Double rating;
 
+    @CreationTimestamp
+    @Column(nullable = false)
+    private Instant createdAt;
 }

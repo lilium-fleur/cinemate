@@ -172,7 +172,7 @@ public class UserProfileService {
         Page<Film> favoriteFilms;
 
         do {
-            favoriteFilms = userListService.findFilmsByTypeList(user, UserListType.FAVORITE, pageable);
+            favoriteFilms = userListService.findFilmsByTypeList(user, UserListType.FAVORITES, pageable);
             for (Film film : favoriteFilms.getContent()) {
                 if (filmContexts.containsKey(film)) {
                     filmContexts.get(film).setInFavourite(true);

@@ -16,6 +16,7 @@ public interface UserCollectionRepository extends JpaRepository<UserCollection, 
     Optional<UserCollection> findByUserIdAndCollectionId(Long userId, Long collectionId);
 
     @Query("SELECT uc FROM UserCollection uc " +
-            "WHERE uc.collection.isPublic = true")
+            "WHERE uc.collection.isPublic = true " +
+            "AND uc.user.id = :userId")
     Page<UserCollection> findPublicCollectionsByUserId(Long userId, Pageable pageable);
 }

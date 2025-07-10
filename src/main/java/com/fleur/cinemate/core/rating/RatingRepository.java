@@ -29,6 +29,8 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
 
     Page<Rating> findByFilmIdIn(List<Long> filmIds, Pageable pageable);
 
+    Page<Rating> findByUserIdAndFilmIdIn(Long userId, List<Long> filmIds, Pageable pageable);
+
     @Query("SELECT DISTINCT r.user.id FROM Rating r")
     Page<Long> findDistinctByUserIds(Pageable pageable);
 

@@ -3,7 +3,6 @@ package com.fleur.cinemate.core.genre;
 import com.fleur.cinemate.core.genre.dto.CreateGenreDto;
 import com.fleur.cinemate.core.genre.dto.GenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.FilmGenreService;
-import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,10 +43,5 @@ public class GenreController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{genreId}/films")
-    public ResponseEntity<Page<FilmGenreDto>> getFilmsByGenre(
-            @PathVariable Long genreId,
-            @PageableDefault Pageable pageable) {
-        return ResponseEntity.ok(filmGenreService.findAllByGenre(genreId, pageable));
-    }
+
 }

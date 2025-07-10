@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record CreateRatingDto(
         @NotNull
         Long filmId,
-        @Min(0)
+        @Min(1)
         @Max(10)
         Double rating
 ) {

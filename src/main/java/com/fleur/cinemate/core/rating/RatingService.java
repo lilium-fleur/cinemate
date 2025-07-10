@@ -84,4 +84,10 @@ public class RatingService {
     public Page<Rating> findRatingsIncludeFilms(List<Long> includeIds, Pageable pageable) {
         return ratingRepository.findByFilmIdIn(includeIds, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<RatingDto> findRatingsByUserAndFilmIds(Long userId, List<Long> filmIds, Pageable pageable) {
+        return ratingRepository.findByUserIdAndFilmIdIn(userId, filmIds, pageable)
+                .map(ratingMapper::toDto);
+    }
 }

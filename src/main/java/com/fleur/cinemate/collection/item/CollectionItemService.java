@@ -64,7 +64,7 @@ public class CollectionItemService {
 
     @CacheEvict(cacheNames = {"userProfile"}, key = "#currentUser")
     @Transactional
-    public void removeItemByCollection(Long collectionId, Long itemId, User currentUser) {
+    public void deleteItemByCollection(Long collectionId, Long itemId, User currentUser) {
         collectionService.getOrThrowException(collectionId, currentUser);
         CollectionItem item = collectionItemRepository
                 .findById(itemId)
@@ -93,11 +93,9 @@ public class CollectionItemService {
         if(Objects.equals(targetPosition, currentPosition)) {
             return collectionItemMapper.toDto(item);
         }
-        //validate target position
         if(targetPosition > maxPosition + 1) targetPosition = maxPosition + 1;
         if(targetPosition < 1) targetPosition = 1;
 
-        //shift items position
         if(currentPosition < targetPosition){
             if(targetPosition <= maxPosition){
                 shiftPositionDown(collection, currentPosition + 1, targetPosition);
@@ -106,7 +104,6 @@ public class CollectionItemService {
             shiftPositionUp(collection, targetPosition, currentPosition - 1);
         }
 
-        //change position of selected item
         item.setPosition(targetPosition);
         return collectionItemMapper.toDto(collectionItemRepository.save(item));
     }
@@ -129,7 +126,7 @@ public class CollectionItemService {
             User currentUser,
             Pageable pageable) {
 
-        Long collectionId = collectionService.findCollectionByIdWithSize(filmCollectionId, currentUser).getId();
+        Long collectionId = collectionService.findCollectionById(filmCollectionId, currentUser).id();
         return collectionItemRepository.findByCollectionIdOrderByPosition(collectionId, pageable);
     }
 
@@ -142,7 +139,6 @@ public class CollectionItemService {
     public Long findItemsCountByCollectionId(Long collectionId) {
         return collectionItemRepository.findItemsCountByCollectionId(collectionId);
     }
-
 
     private void shiftPositionDown(Collection collection, Integer startPosition, Integer endPosition) {
         collectionItemRepository.shiftPositionDownByFilmCollection(collection, startPosition, endPosition);

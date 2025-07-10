@@ -12,7 +12,12 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "film_persons")
+@Table(
+        name = "film_persons",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"film_id", "person_id", "film_role"}
+        )
+)
 @Entity
 public class FilmPerson extends IdEntity {
     @ManyToOne

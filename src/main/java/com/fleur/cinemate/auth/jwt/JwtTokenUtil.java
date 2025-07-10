@@ -67,8 +67,4 @@ public class JwtTokenUtil {
     public String extractUsername(String token) {
         return getAllClaimsFromToken(token).getSubject();
     }
-
-    public Date extractExpiration(String token) {
-        return getAllClaimsFromToken(token).getExpiration();
-    }
 }

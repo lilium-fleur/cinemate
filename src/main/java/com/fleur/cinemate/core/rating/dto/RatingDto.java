@@ -7,7 +7,6 @@ public record RatingDto(
         Long userId,
         Long filmId,
         Double rating,
-        Instant createdAt,
-        Instant lastModifiedAt
+        Instant createdAt
 ) {
 }

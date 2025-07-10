@@ -52,7 +52,7 @@ public class CollectionItemController {
             @PathVariable Long collectionId,
             @PathVariable Long itemId,
             @AuthenticationPrincipal User user){
-        collectionItemService.removeItemByCollection(collectionId, itemId, user);
+        collectionItemService.deleteItemByCollection(collectionId, itemId, user);
         return ResponseEntity.noContent().build();
     }
 }
