@@ -21,12 +21,6 @@ public class FilmController {
     private final FilmService filmService;
 
 
-    @PostMapping("/create-some")
-    public ResponseEntity<List<FilmDto>> createSomeFilms(
-            @RequestBody List<CreateFilmDto> createFilmDtos) {
-        return ResponseEntity.ok(filmService.createSomeFilms(createFilmDtos));
-    }
-
     @PostMapping
     public ResponseEntity<FilmDto> createFilm(
             @RequestBody @Valid CreateFilmDto createdFilmDto) {
@@ -35,8 +29,9 @@ public class FilmController {
 
     @GetMapping
     public ResponseEntity<Page<FilmDto>> getFilms(
-            @PageableDefault(sort = "title") Pageable pageable) {
-        return ResponseEntity.ok(filmService.findAllFilms(pageable));
+            @RequestParam(name = "ids", required = false) List<Long> ids,
+            @PageableDefault Pageable pageable) {
+        return ResponseEntity.ok(filmService.findFilms(ids, pageable));
     }
 
     @GetMapping("/{filmId}")

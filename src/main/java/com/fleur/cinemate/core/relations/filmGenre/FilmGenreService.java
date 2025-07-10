@@ -7,12 +7,11 @@ import com.fleur.cinemate.core.genre.Genre;
 import com.fleur.cinemate.core.genre.GenreRepository;
 import com.fleur.cinemate.core.relations.filmGenre.dto.CreateFilmGenreDto;
 import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenreDto;
+import com.fleur.cinemate.core.relations.filmGenre.dto.FilmGenresDto;
 import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenre;
 import com.fleur.cinemate.core.relations.filmGenre.model.FilmGenreProjection;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +30,7 @@ public class FilmGenreService {
 
 
     @Transactional
-    public FilmGenreDto addGenreToFilm(Long filmId, CreateFilmGenreDto createFilmGenreDto){
+    public FilmGenreDto addGenreToFilm(Long filmId, CreateFilmGenreDto createFilmGenreDto) {
         filmGenreRepository.findByFilmIdAndGenreId(filmId, createFilmGenreDto.genreId())
                 .ifPresent(it -> {
                     throw new BadRequestException("Genre already added to this Film");
@@ -49,7 +48,7 @@ public class FilmGenreService {
     }
 
     @Transactional
-    public void deleteGenreFromFilm(Long filmId, Long genreId){
+    public void deleteGenreFromFilm(Long filmId, Long genreId) {
         FilmGenre filmGenre = filmGenreRepository.findByFilmIdAndGenreId(filmId, genreId)
                 .orElseThrow(() -> new EntityNotFoundException("Genre was not added to this Film"));
 
@@ -57,15 +56,24 @@ public class FilmGenreService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FilmGenreDto> findAllByGenre(Long genreId, Pageable pageable) {
-        return filmGenreRepository.findByGenreId(genreId, pageable)
-                .map(filmGenreMapper::toDto);
+    public FilmGenresDto findGenreNamesByFilm(Long filmId) {
+        List<String> genreNames = filmGenreRepository.findByFilmId(filmId);
+        return FilmGenresDto.builder()
+                .genreNames(genreNames)
+                .filmId(filmId)
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public List<FilmGenreDto> findAllByFilm(Long filmId) {
-        return filmGenreRepository.findByFilmId(filmId).stream()
-                .map(filmGenreMapper::toDto)
+    public List<FilmGenresDto> findGenreNamesByFilmsIds(List<Long> filmIds) {
+        return filmGenreRepository.findGenresByFilmIds(filmIds).stream()
+                .collect(Collectors.groupingBy(FilmGenreProjection::getFilmId,
+                        Collectors.mapping(FilmGenreProjection::getGenreName, Collectors.toList())))
+                .entrySet().stream()
+                .map(e -> FilmGenresDto.builder()
+                        .filmId(e.getKey())
+                        .genreNames(e.getValue())
+                        .build())
                 .toList();
     }
 

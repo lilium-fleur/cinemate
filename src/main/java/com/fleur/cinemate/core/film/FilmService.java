@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -70,8 +69,13 @@ public class FilmService {
     }
 
     @Transactional(readOnly = true)
-    public Page<FilmDto> findAllFilms(Pageable pageable){
-        return filmRepository.findAll(pageable).map(filmMapper::toDto);
+    public Page<FilmDto> findFilms(List<Long> ids, Pageable pageable) {
+        if (ids == null || ids.isEmpty()) {
+            return filmRepository.findAll(pageable)
+                    .map(filmMapper::toDto);
+        }
+        return filmRepository.findAllByIds(ids, pageable)
+                .map(filmMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -96,14 +100,4 @@ public class FilmService {
         return filmRepository.findByIdNotIn(ids, pageable);
     }
 
-    @Transactional
-    public List<FilmDto> createSomeFilms(List<CreateFilmDto> createFilmDtos) {
-        List<FilmDto> newFilms = new ArrayList<>();
-        for (CreateFilmDto createFilmDto : createFilmDtos) {
-            Film newFilm = filmMapper.toEntity(createFilmDto);
-            FilmDto dto = filmMapper.toDto(filmRepository.save(newFilm));
-            newFilms.add(dto);
-        }
-        return newFilms;
-    }
 }
