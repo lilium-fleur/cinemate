@@ -1,9 +1,8 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.collection.dto.CollectionDto;
-import com.fleur.cinemate.collection.dto.CollectionDtoWithSize;
-import com.fleur.cinemate.collection.dto.CreateCollectionDto;
-import com.fleur.cinemate.collection.dto.UpdateCollectionDto;
+import com.fleur.cinemate.collection.dto.*;
+import com.fleur.cinemate.collection.userCollection.UserCollection;
+import com.fleur.cinemate.collection.userCollection.UserCollectionRepository;
 import com.fleur.cinemate.event.RecordDeletedEvent;
 import com.fleur.cinemate.user.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +26,7 @@ public class CollectionService {
     private final CollectionRepository collectionRepository;
     private final CollectionMapper collectionMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserCollectionRepository userCollectionRepository;
 
 
     @Transactional
@@ -39,8 +39,14 @@ public class CollectionService {
                 .author(user)
                 .isPublic(createCollectionDto.isPublic())
                 .build();
+        Collection savedCollection = collectionRepository.save(collection);
 
-        return collectionMapper.toDto(collectionRepository.save(collection));
+        userCollectionRepository.save(UserCollection.builder()
+                .collection(savedCollection)
+                .user(user)
+                .build());
+
+        return collectionMapper.toDto(savedCollection);
     }
 
     @Transactional
@@ -93,12 +99,22 @@ public class CollectionService {
 
     @Transactional(readOnly = true)
     public CollectionDtoWithSize findCollectionByIdWithSize(Long collectionId, User currentUser) {
-        CollectionDtoWithSize collectionDto = collectionRepository.findPublicByIdWithSize(collectionId)
+        CollectionWithSizeProjection collectionProjection = collectionRepository.findByIdWithSize(collectionId)
                 .orElseThrow(() -> new EntityNotFoundException("Collection not found"));
-        if (!collectionDto.getIsPublic() && !collectionDto.getAuthorId().equals(currentUser.getId())) {
+        if (!collectionProjection.getIsPublic() && !collectionProjection.getAuthorId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Permission not found");
         }
-        return collectionDto;
+
+
+        return CollectionDtoWithSize.builder()
+                .id(collectionProjection.getId())
+                .name(collectionProjection.getName())
+                .description(collectionProjection.getDescription())
+                .authorId(collectionProjection.getAuthorId())
+                .createdAt(collectionProjection.getCreatedAt())
+                .isPublic(collectionProjection.getIsPublic())
+                .size(collectionProjection.getSize())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -113,7 +129,15 @@ public class CollectionService {
 
     @Transactional(readOnly = true)
     public Page<CollectionDtoWithSize> findAllPublicCollection(Pageable pageable) {
-        return collectionRepository.findAllPublicWithSize(pageable);
+        return collectionRepository.findAllPublicWithSize(pageable)
+                .map(projection -> CollectionDtoWithSize.builder()
+                        .id(projection.getId())
+                        .name(projection.getName())
+                        .description(projection.getDescription())
+                        .authorId(projection.getAuthorId())
+                        .createdAt(projection.getCreatedAt())
+                        .size(projection.getSize())
+                        .build());
     }
 
 

@@ -1,20 +1,17 @@
 package com.fleur.cinemate.collection.dto;
 
+import lombok.Builder;
+
 import java.time.Instant;
 
-public interface CollectionDtoWithSize {
-    Long getId();
-
-    String getName();
-
-    String getDescription();
-
-    Long getAuthorId();
-
-    Boolean getIsPublic();
-
-    Instant getCreatedAt();
-
-    Long getSize();
-
+@Builder
+public record CollectionDtoWithSize(
+        Long id,
+        String name,
+        String description,
+        Long authorId,
+        Boolean isPublic,
+        Instant createdAt,
+        Long size
+) {
 }

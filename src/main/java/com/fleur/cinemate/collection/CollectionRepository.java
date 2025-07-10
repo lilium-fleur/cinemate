@@ -1,6 +1,6 @@
 package com.fleur.cinemate.collection;
 
-import com.fleur.cinemate.collection.dto.CollectionDtoWithSize;
+import com.fleur.cinemate.collection.dto.CollectionWithSizeProjection;
 import com.fleur.cinemate.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,12 +16,13 @@ import java.util.Optional;
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     Page<Collection> findAllByAuthor(User user, Pageable pageable);
 
-    @Query("SELECT c.id, c.name, c.description, c.author.id AS authorId, c.isPublic, c.createdAt, COUNT(ci) AS size " +
+    @Query("SELECT c.id AS id, c.name AS name, c.description AS description, c.author.id AS authorId, " +
+            "c.isPublic AS isPublic, c.createdAt AS createdAt, COUNT(ci) AS size " +
             "FROM Collection c " +
             "LEFT JOIN CollectionItem ci ON ci.collection.id = c.id " +
-            "WHERE c.isPublic = true AND c.id = :collectionId " +
+            "WHERE c.id = :collectionId " +
             "GROUP BY c.id, c.name, c.description, c.author.id, c.isPublic, c.createdAt")
-    Optional<CollectionDtoWithSize> findPublicByIdWithSize(Long collectionId);
+    Optional<CollectionWithSizeProjection> findByIdWithSize(Long collectionId);
 
     @Query("SELECT c FROM Collection c " +
             "WHERE c.id = :collectionId AND c.isPublic = true")
@@ -31,12 +32,13 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE c.isPublic = true")
     Page<Collection> findAllPublic(Pageable pageable);
 
-    @Query("SELECT c.id AS id, c.name AS name, c.description AS description, c.author.id AS authorId, c.isPublic AS isPublic, c.createdAt AS createdAt, COUNT(ci) AS size " +
+    @Query("SELECT c.id AS id, c.name AS name, c.description AS description, c.author.id AS authorId, " +
+            "c.isPublic AS isPublic, c.createdAt AS createdAt, COUNT(ci) AS size " +
             "FROM Collection c " +
             "LEFT JOIN CollectionItem ci ON ci.collection.id = c.id " +
             "WHERE c.isPublic = true " +
             "GROUP BY c.id, c.name, c.description, c.author.id, c.isPublic, c.createdAt")
-    Page<CollectionDtoWithSize> findAllPublicWithSize(Pageable pageable);
+    Page<CollectionWithSizeProjection> findAllPublicWithSize(Pageable pageable);
 
     @Query("SELECT c FROM Collection c " +
             "WHERE c.isPublic = true " +
